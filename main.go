@@ -13,14 +13,17 @@ import (
 var data []string
 
 type SensorInfo struct {
-	Message string
+	Message string // Hier Struktur von FireFly json
 }
 
 func Store(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Store data", r.Body)
 	var sensorInfo SensorInfo
-	_ = json.NewDecoder(r.Body).Decode(&sensorInfo)
-	data = append(data, sensorInfo.Message)
+
+	// Wie HTTP - request Body augeben, lesbar
+
+	//_ = json.NewDecoder(r.Body).Decode(&sensorInfo)
+	//data = append(data, sensorInfo.Message)
 }
 
 func Infos(w http.ResponseWriter, r *http.Request) {
