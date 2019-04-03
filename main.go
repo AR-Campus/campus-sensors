@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -18,13 +19,10 @@ type SensorInfo struct {
 }
 
 func Store(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Store data", r.Body)
-	var sensorInfo SensorInfo
-
-	fmt.Println(sensorInfo)
-
 	// Wie HTTP - request Body augeben, lesbar
-
+	bodyBuffer, _ := ioutil.ReadAll(r.Body)
+	fmt.Println("Store data", bodyBuffer)
+	//	var sensorInfo SensorInfo
 	//_ = json.NewDecoder(r.Body).Decode(&sensorInfo)
 	//data = append(data, sensorInfo.Message)
 }
