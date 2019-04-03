@@ -44,10 +44,12 @@ func main() {
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
 
-	port := os.Getenv("PORT")
-	if port == "" {
+	herokuPort := os.Getenv("PORT")
+	var port string
+	if herokuPort == "" {
 		port = "locahost:5555"
+	} else {
+		port = ":" + herokuPort
 	}
 	log.Fatal(http.ListenAndServe(port, router))
-
 }
