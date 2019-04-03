@@ -20,6 +20,8 @@ func Store(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Store data", r.Body)
 	var sensorInfo SensorInfo
 
+	fmt.Println(sensorInfo)
+
 	// Wie HTTP - request Body augeben, lesbar
 
 	//_ = json.NewDecoder(r.Body).Decode(&sensorInfo)
