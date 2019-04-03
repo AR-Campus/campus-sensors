@@ -6,6 +6,7 @@ import (
 	"html"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -43,6 +44,10 @@ func main() {
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
 
-	log.Fatal(http.ListenAndServe(":5555", router))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "locahost:5555"
+	}
+	log.Fatal(http.ListenAndServe(port, router))
 
 }
