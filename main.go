@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -19,9 +19,12 @@ type SensorInfo struct {
 }
 
 func Store(w http.ResponseWriter, r *http.Request) {
-	// Wie HTTP - request Body augeben, lesbar
-	bodyBuffer, _ := ioutil.ReadAll(r.Body)
-	fmt.Println("Store data", bodyBuffer)
+	requestDump, err := httputil.DumpRequest(r, true)
+	fmt.Println(string(requestDump))
+	if err != nil {
+		fmt.Println("Got error")
+	}
+
 	//	var sensorInfo SensorInfo
 	//_ = json.NewDecoder(r.Body).Decode(&sensorInfo)
 	//data = append(data, sensorInfo.Message)
@@ -45,7 +48,7 @@ func main() {
 	herokuPort := os.Getenv("PORT")
 	var port string
 	if herokuPort == "" {
-		port = "locahost:5555"
+		port = "localhost:5555"
 	} else {
 		port = ":" + herokuPort
 	}
