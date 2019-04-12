@@ -67,7 +67,7 @@ func main() {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
 	} else {
 		responseData, _ := ioutil.ReadAll(response.Body)
-		data = sensors.ConvertInfos(string(responseData))
+		data = append(data, sensors.ConvertInfos(string(responseData))...)
 	}
 	// } else {
 	// 	responseData, _ := ioutil.ReadAll(response.Body)
