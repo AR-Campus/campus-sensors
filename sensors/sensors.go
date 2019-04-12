@@ -45,6 +45,7 @@ func ConvertInfos(rawFireFlyData string) []SensorInfo {
 	err := json.Unmarshal([]byte(rawFireFlyData), &sensorJson)
 	if err != nil {
 		fmt.Println("Json Unmarshal failed:", err)
+		fmt.Println("Incorrect String Input:", rawFireFlyData)
 		return make([]SensorInfo, 0)
 	}
 	// fmt.Println("Len of Packets", len(sensorJson))
@@ -53,7 +54,7 @@ func ConvertInfos(rawFireFlyData string) []SensorInfo {
 		result = append(result, entry)
 		// fmt.Println("entry", result)
 	}
-	fmt.Println("Test entrys of parsed_Map:", result[6].Parsed)
+	// fmt.Println("Test entrys of parsed_Map:", result[6].Parsed)
 	return result
 }
 

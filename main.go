@@ -67,9 +67,13 @@ func main() {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
 	} else {
 		responseData, _ := ioutil.ReadAll(response.Body)
-		data = responseData
-		fmt.Println("Called SensorPackages from FireFly")
+		data = sensors.ConvertInfos(string(responseData))
 	}
+	// } else {
+	// 	responseData, _ := ioutil.ReadAll(response.Body)
+	// 	data = responseData
+	// 	fmt.Println("Called SensorPackages from FireFly")
+	// }
 	// post, err := http.Post(port+"/store", marshal(data), r.io.Reader)
 	// if err != nil {
 	// 	fmt.Printf("The HTTP request failed with error %s\n", err)
