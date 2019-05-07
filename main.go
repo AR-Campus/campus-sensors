@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"strconv"
+	"time"
 
 	"db-training.de/campus-sensors/sensors"
 	"github.com/gorilla/mux"
@@ -82,12 +83,13 @@ func initData(lastNReq int64) {
 		Noff := (i - 1) * 100
 		FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&offset=%v&limit_to_last=%v", authKey, Noff, 100)
 		response, err := http.Get(FireFlyURL)
-		if err != nil {
-			fmt.Printf("The HTTP request failed with error %s\n", err)
+		if err != nil && response.StatusCode != 200 {
+			fmt.Printf("The HTTP request failed with error %s, Status %v\n", err, response.StatusCode)
 			return
 		}
 		responseData, _ := ioutil.ReadAll(response.Body)
 		data = append(data, sensors.ConvertInfos(string(responseData))...)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
