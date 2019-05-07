@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"html"
 	"io/ioutil"
@@ -32,7 +31,9 @@ func Store(w http.ResponseWriter, r *http.Request) {
 
 func Infos(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get data")
-	json.NewEncoder(w).Encode(data)
+	dataLen := len(data)
+	fmt.Fprintf(w, "Sensordaten in der Pseudo-Datenbank: %v, %q", dataLen, html.EscapeString(r.URL.Path))
+	// json.NewEncoder(w).Encode(data)
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
