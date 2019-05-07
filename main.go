@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var data []sensors.SensorInfo
+var data []sensors.SensorData
 
 var authKey = os.Getenv("FIREFLY_APIKEY")
 
