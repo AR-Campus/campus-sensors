@@ -43,6 +43,16 @@ func Sensors(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Sensordaten und Graphische Darstellungen, %q", html.EscapeString(r.URL.Path))
 }
 
+func ReInitialize(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Sensordaten mit aktueller Anzahl an Sensordaten aus GetEnv in x100, %q", html.EscapeString(r.URL.Path))
+	var lastN int64
+	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
+	if err != nil {
+		lastN = 10
+	}
+	go initData(lastN)
+}
+
 // func initData(lastN int64) {
 // 	log.Printf("Load last %v packets from Firefly", lastN)
 // 	FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&limit_to_last=%v", authKey, lastN)
@@ -77,6 +87,7 @@ func main() {
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
 	router.HandleFunc("/sensors", Sensors)
+	router.HandleFunc("/reinit", ReInitialize).Methods("POST")
 
 	herokuPort := os.Getenv("PORT")
 	if herokuPort == "" {
