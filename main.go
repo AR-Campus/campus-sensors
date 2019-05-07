@@ -76,6 +76,6 @@ func main() {
 	// }
 
 	//go initData(lastN)
-
+	log.Print("Starting server at: ", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
