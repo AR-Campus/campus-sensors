@@ -6,9 +6,9 @@ import (
 )
 
 type SensorInfo struct {
-	Device_EUI string `json:"device_eui"`
-	// RawPayload string                 `json:"raw_payload"`
-	Parsed map[string]interface{} `json:"parsed"`
+	Device_EUI string                   `json:"device_eui"`
+	GWRX       []map[string]interface{} `json:"gwrx"`
+	Parsed     map[string]interface{}   `json:"parsed"`
 }
 
 type FireFlyPackage struct {

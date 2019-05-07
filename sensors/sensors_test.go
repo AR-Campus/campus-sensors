@@ -31,7 +31,7 @@ func TestPasedSensorData(t *testing.T) {
 func TestPasedSingleSensorData(t *testing.T) {
 	et := expectations.NewT(t)
 	var result []sensors.SensorInfo = sensors.ConvertSingle(singelFireFlyData())
-	fmt.Println("Test entrys of parsed_Map of Package 0:", result[0].Parsed)
+	fmt.Println("Test entrys of parsed_Map of Package 0:", result[0].GWRX)
 	// fmt.Println("Input String length", len(rawSensorDataPackets))
 	et.ExpectThat(len(result)).DoesNotEqual(0)
 
