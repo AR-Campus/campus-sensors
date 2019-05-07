@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strconv"
 
 	"db-training.de/campus-sensors/sensors"
 	"github.com/gorilla/mux"
@@ -72,13 +73,13 @@ func main() {
 	} else {
 		port = ":" + herokuPort
 	}
-	// var lastN int64
-	// lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
-	// if err != nil {
-	// 	lastN = 10
-	// }
+	var lastN int64
+	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
+	if err != nil {
+		lastN = 10
+	}
+	go initData(lastN)
 
-	//go initData(lastN)
 	log.Print("Starting server at: ", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
