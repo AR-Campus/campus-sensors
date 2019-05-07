@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"io/ioutil"
@@ -33,7 +34,12 @@ func Infos(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get data")
 	dataLen := len(data)
 	fmt.Fprintf(w, "Sensordaten in der Pseudo-Datenbank: %v, %q", dataLen, html.EscapeString(r.URL.Path))
-	// json.NewEncoder(w).Encode(data)
+	fmt.Fprintf(w, "First 20 Entries:")
+	beginning := data[:20]
+	json.NewEncoder(w).Encode(beginning)
+	fmt.Fprintf(w, "Last 20 Entries:")
+	dataend := data[(dataLen - 20):]
+	json.NewEncoder(w).Encode(dataend)
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +74,7 @@ func ReInitialize(w http.ResponseWriter, r *http.Request) {
 
 func initData(lastNReq int64) {
 	log.Printf("Load last %v packets from Firefly", lastNReq)
-	for i := 1; i < int(lastNReq); i++ {
+	for i := 1; i <= int(lastNReq); i++ {
 		Noff := (i - 1) * 100
 		FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&offset=%v&limit_to_last=%v", authKey, Noff, 100)
 		response, err := http.Get(FireFlyURL)
