@@ -36,7 +36,7 @@ func ConvertSensorType(sensorInfoTypeArray []SensorInfo) []SensorData {
 }
 
 func ConvertInfos(rawFireFlyData string) []SensorData {
-	log.Print("Raw data", rawFireFlyData)
+	log.Print("Convert many sensor values: ", rawFireFlyData)
 	var sensorJson FireFlyPackage
 	err := json.Unmarshal([]byte(rawFireFlyData), &sensorJson)
 	if err != nil {
@@ -47,7 +47,7 @@ func ConvertInfos(rawFireFlyData string) []SensorData {
 }
 
 func ConvertSingle(rawFireFlyData string) []SensorData {
-	log.Print("Raw data", rawFireFlyData)
+	log.Print("Convert single sensor value: ", rawFireFlyData)
 	var sensorJson FireFlySingle
 	err := json.Unmarshal([]byte(rawFireFlyData), &sensorJson)
 	if err != nil {

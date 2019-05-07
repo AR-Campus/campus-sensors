@@ -20,8 +20,8 @@ var data []sensors.SensorData
 var authKey = os.Getenv("FIREFLY_APIKEY")
 
 func Store(w http.ResponseWriter, r *http.Request) {
-	requestDump, err := httputil.DumpRequest(r, true)
-	fmt.Println(string(requestDump))
+	requestDump, err := httputil.DumpRequest(r, false)
+	log.Println("Got firefly push", string(requestDump))
 	if err != nil {
 		fmt.Println("Got error")
 	}
