@@ -89,7 +89,7 @@ func initData(lastNReq int64) {
 		}
 		responseData, _ := ioutil.ReadAll(response.Body)
 		data = append(data, sensors.ConvertInfos(string(responseData))...)
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 	}
 }
 
