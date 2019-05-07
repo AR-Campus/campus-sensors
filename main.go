@@ -63,6 +63,9 @@ func main() {
 	router.HandleFunc("/sensors", Sensors)
 
 	herokuPort := os.Getenv("PORT")
+	if herokuPort == "" {
+		log.Fatal("$PORT must be set")
+	}
 	var port string
 	if herokuPort == "" {
 		port = "localhost:5555"
