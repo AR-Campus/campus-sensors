@@ -1,4 +1,4 @@
-module github.com/AR-Campus/campus-sensors
+module db-training.de/campus-sensors
 
 go 1.12
 
