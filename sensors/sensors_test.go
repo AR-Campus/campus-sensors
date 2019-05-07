@@ -28,6 +28,15 @@ func TestPasedSensorData(t *testing.T) {
 
 }
 
+func TestPasedSingleSensorData(t *testing.T) {
+	et := expectations.NewT(t)
+	var result []sensors.SensorInfo = sensors.ConvertSingle(singelFireFlyData())
+	fmt.Println("Test entrys of parsed_Map of Package 0:", result[0].Parsed)
+	// fmt.Println("Input String length", len(rawSensorDataPackets))
+	et.ExpectThat(len(result)).DoesNotEqual(0)
+
+}
+
 func TestReturnEmptyListOnBrokenJson(t *testing.T) {
 	et := expectations.NewT(t)
 	result := sensors.ConvertInfos(`[{"SomeJibberish"}]`)
@@ -36,43 +45,7 @@ func TestReturnEmptyListOnBrokenJson(t *testing.T) {
 }
 
 func singelFireFlyData() string {
-	dataString := `[{
-		"uid":"Your-Personal-Device-UID",
-		"spreading_factor":7,
-		"size":26,
-		"received_at":"some-Date-Time-Format",
-		"port":5,
-		"payload_encrypted":false,
-		"payload":"Some-HexaDeciaml-Value",
-		"parsed":{
-			"VDDID":001,
-			"VDD":3.1415,
-			"TempID":1,
-			"Temp":180,
-			"MotionID":2,
-			"Motion":42,
-			"LightID":21,
-			"Light":42,
-			"HumidityID":21,
-			"Humidity":42},
-		"mtype":"soem-String",
-		"modu":"LORA",
-		"mic_pass":true,
-		"gwrx":[{
-			"tmst":31415926,
-			"time":"another-Date-Time-Format",
-			"srv_rcv_time":1234567891,
-			"rssi":-42,
-			"lsnr":10.0,
-			"gweui":"Another-HexaDecimal-Value"}],
-		"freq":868.1,
-		"fopts":"",
-		"fcnt":12345,
-		"device_eui":"Your-Device-EUI",
-		"datr":"HexaDecimalValue",
-		"codr":"1/3",
-		"bandwidth":123,
-		"ack":false}]`
+	dataString := `{"up_packet":{"uid":"1a106790-f513-4ed1-ad00-05f9531a8221","spreading_factor":7,"size":26,"received_at":"2019-05-07T10:00:09.851728","port":5,"payload_encrypted":false,"payload":"0100D502280401120500070DE7","parsed":{"VDDID":112,"VDD":3.559,"TempID":16,"Temp":21.3,"MotionID":5,"Motion":0,"LightID":64,"Light":274,"HumidityID":2,"Humidity":40},"mtype":"unconfirmed_data_up","modu":"LORA","mic_pass":true,"gwrx":[{"tmst":150718555,"time":"2019-05-07T10:00:08.483371Z","srv_rcv_time":1557223208535632,"rssi":-61,"lsnr":7.2,"gweui":"00000008004A0826"}],"freq":868.5,"fopts":"","fcnt":163010,"device_eui":"A81758FFFE031A09","datr":"SF7BW125","codr":"4/5","bandwidth":125,"ack":null}}`
 	return dataString
 }
 

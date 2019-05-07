@@ -27,7 +27,7 @@ func Store(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, _ := ioutil.ReadAll(r.Body)
-	data = append(data, sensors.ConvertInfos(string(result))...)
+	data = append(data, sensors.ConvertSingle(string(result))...)
 }
 
 func Infos(w http.ResponseWriter, r *http.Request) {
