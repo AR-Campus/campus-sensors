@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"strconv"
 
 	"db-training.de/campus-sensors/sensors"
 	"github.com/gorilla/mux"
@@ -25,9 +26,8 @@ func Store(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Got error")
 	}
 
-	var sensorInfo sensors.SensorInfo
-	_ = json.NewDecoder(r.Body).Decode(&sensorInfo)
-	data = append(data, sensorInfo)
+	result, _ := ioutil.ReadAll(r.Body)
+	data = append(data, sensors.ConvertInfos(string(result))...)
 }
 
 func Infos(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +41,18 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 func Sensors(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Sensordaten und Graphische Darstellungen, %q", html.EscapeString(r.URL.Path))
+}
+
+func initData(lastN int64) {
+	log.Printf("Load last %v packets from Firefly", lastN)
+	FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&limit_to_last=%v", authKey, lastN)
+	response, err := http.Get(FireFlyURL)
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+		return
+	}
+	responseData, _ := ioutil.ReadAll(response.Body)
+	data = sensors.ConvertInfos(string(responseData))
 }
 
 func main() {
@@ -58,17 +70,17 @@ func main() {
 	} else {
 		port = ":" + herokuPort
 	}
+	var lastN int64
+	lastN, err := strconv.ParseInt(os.Getenv("PORT"), 10, 64)
+	if err != nil {
+		lastN = 10
+	}
+
+	go initData(lastN)
+
 	log.Fatal(http.ListenAndServe(port, router))
 
 	// Fetch last Sensor-Package
-	FireFlyCall := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&limit_to_last=1", authKey)
-	response, err := http.Get(FireFlyCall)
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
-	} else {
-		responseData, _ := ioutil.ReadAll(response.Body)
-		data = append(data, sensors.ConvertInfos(string(responseData))...)
-	}
 	// } else {
 	// 	responseData, _ := ioutil.ReadAll(response.Body)
 	// 	data = responseData

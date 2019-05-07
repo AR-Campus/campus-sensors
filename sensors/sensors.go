@@ -2,7 +2,7 @@ package sensors
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 // type SensorInfo struct {
@@ -41,20 +41,18 @@ type FireFlyPackage struct {
 // }
 
 func ConvertInfos(rawFireFlyData string) []SensorInfo {
+	log.Print("Raw data", rawFireFlyData)
 	var sensorJson FireFlyPackage
 	err := json.Unmarshal([]byte(rawFireFlyData), &sensorJson)
 	if err != nil {
-		fmt.Println("Json Unmarshal failed:", err)
-		fmt.Println("Incorrect String Input:", rawFireFlyData)
+		log.Println("Json Unmarshal failed:", err)
 		return make([]SensorInfo, 0)
 	}
-	// fmt.Println("Len of Packets", len(sensorJson))
 	var result []SensorInfo
 	for _, entry := range sensorJson.Packets {
 		result = append(result, entry)
-		// fmt.Println("entry", result)
 	}
-	// fmt.Println("Test entrys of parsed_Map:", result[6].Parsed)
+	log.Print("Result", result)
 	return result
 }
 
