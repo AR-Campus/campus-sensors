@@ -71,27 +71,12 @@ func main() {
 		port = ":" + herokuPort
 	}
 	var lastN int64
-	lastN, err := strconv.ParseInt(os.Getenv("PORT"), 10, 64)
+	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
 	if err != nil {
 		lastN = 10
 	}
 
-	go initData(lastN)
+	//go initData(lastN)
 
 	log.Fatal(http.ListenAndServe(port, router))
-
-	// Fetch last Sensor-Package
-	// } else {
-	// 	responseData, _ := ioutil.ReadAll(response.Body)
-	// 	data = responseData
-	// 	fmt.Println("Called SensorPackages from FireFly")
-	// }
-	// post, err := http.Post(port+"/store", marshal(data), r.io.Reader)
-	// if err != nil {
-	// 	fmt.Printf("The HTTP request failed with error %s\n", err)
-	// } else {
-	// 	data, _ := ioutil.ReadAll(response.Body)
-	// 	fmt.Println("Stored Packages")
-	// }
-
 }
