@@ -3,7 +3,6 @@ package sensors
 import (
 	"encoding/json"
 	"log"
-	"time"
 )
 
 type SensorInfo struct {
@@ -14,7 +13,7 @@ type SensorInfo struct {
 
 type SensorData struct {
 	DeviceID     string                 `json:"device_id"`
-	Time         time.Time              `json:"time"`
+	Time         string                 `json:"time"`
 	SensorValues map[string]interface{} `json:"sensor_values"`
 }
 
@@ -29,8 +28,8 @@ type FireFlySingle struct {
 func ConvertSensorType(sensorInfoTypeArray []SensorInfo) []SensorData {
 	result := make([]SensorData, len(sensorInfoTypeArray))
 	for i, entry := range sensorInfoTypeArray {
-		time, _ := time.Parse(time.RFC3339, entry.GWRX[0]["time"].(string))
-		result[i] = SensorData{DeviceID: entry.Device_EUI, Time: time, SensorValues: entry.Parsed}
+		// time, _ := time.Parse(time.RFC3339, entry.GWRX[0]["time"].(string))
+		result[i] = SensorData{DeviceID: entry.Device_EUI, Time: entry.GWRX[0]["time"].(string), SensorValues: entry.Parsed}
 	}
 	return result
 }
