@@ -40,17 +40,24 @@ func Store(w http.ResponseWriter, r *http.Request) {
 func Infos(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Get data")
 	dataLen := len(data)
+	intervalShown := 10
 	fmt.Fprintf(w, "Sensordaten in der Pseudo-Datenbank: %v, %q", dataLen, html.EscapeString(r.URL.Path))
 	fmt.Fprintf(w, "\n \n")
-	fmt.Fprintf(w, "First 20 Entries:")
+	fmt.Fprintf(w, "First %v Entries:", intervalShown)
 	fmt.Fprintf(w, "\n")
-	beginning := data[:20]
+	beginning := data[:intervalShown]
 	json.NewEncoder(w).Encode(beginning)
 	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "Last 20 Entries:")
+	fmt.Fprintf(w, "Last %v Entries:", intervalShown)
 	fmt.Fprintf(w, "\n")
-	dataend := data[(dataLen - 20):]
+	dataend := data[(dataLen - intervalShown):]
 	json.NewEncoder(w).Encode(dataend)
+	fmt.Fprintf(w, "\n \n")
+	if dataInit {
+		fmt.Fprintf(w, "Initialisation complete!")
+	} else {
+		fmt.Fprintf(w, "Initialisation running!")
+	}
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
