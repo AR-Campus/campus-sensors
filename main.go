@@ -80,7 +80,7 @@ func getLastSensorPackageDateTime() string {
 	}
 	responseData, _ := ioutil.ReadAll(response.Body)
 	cacheData = sensors.ConvertInfos(string(responseData))
-	fmt.Println(cacheData)
+	// fmt.Println(cacheData)
 	return cacheData[0].Time
 }
 
