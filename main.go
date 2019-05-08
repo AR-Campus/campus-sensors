@@ -108,7 +108,7 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 			log.Printf("Load last packets from Firefly starting currently at %v", startDate)
 			data = append(data, cacheData[:(len(cacheData)-1)]...)
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 
