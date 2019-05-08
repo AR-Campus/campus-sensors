@@ -105,11 +105,17 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 			data = append(make([]sensors.SensorData, 0))
 		} else {
 			startDate = cacheData[(len(cacheData) - 1)].Time
+			dateStart, _ = time.Parse(time.RFC3339, startDate)
 			log.Printf("Load last packets from Firefly starting currently at %v", startDate)
 			data = append(data, cacheData[:(len(cacheData)-1)]...)
+			log.Printf("DataBase current size: %v", len(data))
 		}
-		time.Sleep(10 * time.Second)
+		endDate := getLastSensorPackageDateTime()
+		time.Sleep(3 * time.Second)
+		log.Printf("Check for new EndDate, now new at %v", endDate)
+		time.Sleep(2 * time.Second)
 	}
+	log.Printf("Initialisation complete!")
 }
 
 // func initData(lastN int64) {
