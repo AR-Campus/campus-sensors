@@ -111,9 +111,9 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 			log.Printf("DataBase current size: %v", len(data))
 		}
 		endDate := getLastSensorPackageDateTime()
-		time.Sleep(3 * time.Second)
-		log.Printf("Check for new EndDate, now new at %v", endDate)
 		time.Sleep(2 * time.Second)
+		log.Printf("Check for new EndDate, now new at %v", endDate)
+		time.Sleep(1 * time.Second)
 	}
 	log.Printf("Initialisation complete!")
 }
