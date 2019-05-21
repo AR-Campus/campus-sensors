@@ -113,7 +113,7 @@ func Sensors(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "\n \n")
 	fmt.Fprintf(w, "Sensor Package Flow:")
 	fmt.Fprintf(w, "\n \n")
-	for _, entry := range sensorPackageFlowData[(len(sensorPackageFlowData) - 24):] {
+	for _, entry := range sensorPackageFlowData[(len(sensorPackageFlowData) - 48):] {
 		fmt.Fprintf(w, "time: %v  - ", entry.HourTimeData)
 		for s := 0; s <= entry.QuantityOfSensorPackages; s += 5 {
 			fmt.Fprintf(w, "#")
