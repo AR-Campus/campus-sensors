@@ -21,6 +21,7 @@ var cacheData []sensors.SensorData
 var dataInit = false
 var dateStart time.Time
 var dateEnd time.Time
+var currentWindowStatus windowContactsStatus
 
 var authKey = os.Getenv("FIREFLY_APIKEY")
 
@@ -68,15 +69,15 @@ func Sensors(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Sensordaten und Graphische Darstellungen, %q", html.EscapeString(r.URL.Path))
 }
 
-func ReInitialize(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Sensordaten mit aktueller Anzahl an Sensordaten aus GetEnv in x100, %q", html.EscapeString(r.URL.Path))
-	var lastN int64
-	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
-	if err != nil {
-		lastN = 10
-	}
-	go initData(lastN)
-}
+// func ReInitialize(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Fprintf(w, "Sensordaten mit aktueller Anzahl an Sensordaten aus GetEnv in x100, %q", html.EscapeString(r.URL.Path))
+// 	var lastN int64
+// 	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
+// 	if err != nil {
+// 		lastN = 10
+// 	}
+// 	go initData(lastN)
+// }
 
 func getLastSensorPackageDateTime() string {
 	FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&limit_to_last=1", authKey)
@@ -92,6 +93,7 @@ func getLastSensorPackageDateTime() string {
 }
 
 func initData(lastN int64) { // For Loop untli All Packets from starting Date on are received
+	currentWindowStatus = windowContactsStatus{BakerStr_Fenster_Li: false, BakerStr_Fenster_Re: false, Kueche_Fenster_Li: false, Kueche_Fenster_Re: false}
 	startDate := os.Getenv("START_DATE")
 	log.Printf("Load last packets from Firefly starting currently at %v", startDate)
 	endDate := getLastSensorPackageDateTime()
@@ -161,7 +163,7 @@ func main() {
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
 	router.HandleFunc("/sensors", Sensors)
-	router.HandleFunc("/reinit", ReInitialize).Methods("POST")
+	// router.HandleFunc("/reinit", ReInitialize).Methods("POST")
 
 	herokuPort := os.Getenv("PORT")
 	if herokuPort == "" {
