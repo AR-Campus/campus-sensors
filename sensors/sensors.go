@@ -25,6 +25,13 @@ type FireFlySingle struct {
 	Packet SensorInfo `json:"up_packet"`
 }
 
+// type WindowContactsStatus struct {
+// 	BakerStrFensterLi bool `json:"BakerStr-Fenster-Li"`
+// 	BakerStrFensterRe bool `json:"BakerStr-Fenster-Re"`
+// 	KuecheFensterLi   bool `json:"Kueche-Fenster-Li"`
+// 	KuecheFensterRe   bool `json:"Kueche-Fenster-Re"`
+// }
+
 func corelateDevIDtoName(deviceID string) string {
 	switch deviceID {
 	case "A81758FFFE031A09":
@@ -81,3 +88,16 @@ func ConvertSingle(rawFireFlyData string) []SensorData {
 	log.Printf("Converted %v Sensorvalues.", len(result))
 	return result
 }
+
+// func windowContactSensorsUpdate(singleSensorData SensorData, currentWindowStatus WindowContactsStatus) {
+// 	switch singleSensorData.DeviceID {
+// 	case "BakerStr-Fenster-Li":
+// 		currentWindowStatus.BakerStrFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
+// 	case "BakerStr-Fenster-Re":
+// 		currentWindowStatus.BakerStrFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
+// 	case "Kueche-Fenster-Li":
+// 		currentWindowStatus.KuecheFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
+// 	case "Kueche-Fenster-Re":
+// 		currentWindowStatus.KuecheFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
+// 	}
+// }

@@ -1,0 +1,29 @@
+// Unused Code:
+
+// func initData(lastN int64) {
+// 	log.Printf("Load last packets from Firefly starting 2018-09-01T00:10:00Z")
+// 	FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&direction=asc&received_after=2018-09-01T00:10:00Z&limit_to_last=100", authKey)
+// 	response, err := http.Get(FireFlyURL)
+// 	if err != nil {
+// 		fmt.Printf("The HTTP request failed with error %s\n", err)
+// 		return
+// 	}
+// 	responseData, _ := ioutil.ReadAll(response.Body)
+// 	data = sensors.ConvertInfos(string(responseData))
+// }
+
+// func initData(lastNReq int64) {
+// 	log.Printf("Load last %v packets from Firefly", lastNReq)
+// 	for i := 200; i <= int(lastNReq); i++ {
+// 		Noff := (i - 1) * 100
+// 		FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&offset=%v&limit_to_last=%v", authKey, Noff, 100)
+// 		response, err := http.Get(FireFlyURL)
+// 		if err != nil || response.StatusCode != 200 {
+// 			fmt.Printf("The HTTP request failed with error %v, Status %v , At N-Offsett: %v \n", err, response.StatusCode, Noff)
+// 			return
+// 		}
+// 		responseData, _ := ioutil.ReadAll(response.Body)
+// 		data = append(data, sensors.ConvertInfos(string(responseData))...)
+// 		time.Sleep(250 * time.Millisecond)
+// 	}
+// }
