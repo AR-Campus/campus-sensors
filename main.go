@@ -23,7 +23,8 @@ var dataInit = false
 var dateStart time.Time
 var dateEnd time.Time
 var currentWindowStatus dataanalysis.WindowContactsStatus
-var sensorPackageFlowData []dataanalysis.SensorFlowPerHour
+var sensorPackageHourFlowData []dataanalysis.SensorFlowPerHour
+var sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay
 var sentPackagesPerSensor dataanalysis.PackagesPerSensorCount
 
 var authKey = os.Getenv("FIREFLY_APIKEY")
@@ -38,7 +39,7 @@ func Store(w http.ResponseWriter, r *http.Request) {
 
 		result, _ := ioutil.ReadAll(r.Body)
 		newEntry := sensors.ConvertSingle(string(result))
-		currentWindowStatus, sensorPackageFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(newEntry[0], currentWindowStatus, sensorPackageFlowData, sentPackagesPerSensor)
+		currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(newEntry[0], currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
 		data = append(data, newEntry...)
 	}
 }
@@ -75,29 +76,30 @@ func Sensors(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "\n \n")
 	fmt.Fprintf(w, "Current Window Status:")
 	fmt.Fprintf(w, "\n \n")
-	if currentWindowStatus.BakerStrFensterLi == false {
-		fmt.Fprintf(w, "BStr-F-L: geschlossen")
-	} else {
-		fmt.Fprintf(w, "BStr-F-L: offen")
-	}
-	fmt.Fprintf(w, "\n")
-	if currentWindowStatus.BakerStrFensterRe == false {
-		fmt.Fprintf(w, "BStr-F-R: geschlossen")
-	} else {
-		fmt.Fprintf(w, "BStr-F-R: offen")
-	}
-	fmt.Fprintf(w, "\n")
-	if currentWindowStatus.KuecheFensterLi == false {
-		fmt.Fprintf(w, "Kue-F-L: geschlossen")
-	} else {
-		fmt.Fprintf(w, "Kue-F-L: offen")
-	}
-	fmt.Fprintf(w, "\n")
-	if currentWindowStatus.KuecheFensterRe == false {
-		fmt.Fprintf(w, "Kue-F-R: geschlossen")
-	} else {
-		fmt.Fprintf(w, "Kue-F-R: offen")
-	}
+	dataanalysis.DrawWindowStatus(w, currentWindowStatus)
+	// if currentWindowStatus.BakerStrFensterLi == false {
+	// 	fmt.Fprintf(w, "BStr-F-L: geschlossen")
+	// } else {
+	// 	fmt.Fprintf(w, "BStr-F-L: offen")
+	// }
+	// fmt.Fprintf(w, "\n")
+	// if currentWindowStatus.BakerStrFensterRe == false {
+	// 	fmt.Fprintf(w, "BStr-F-R: geschlossen")
+	// } else {
+	// 	fmt.Fprintf(w, "BStr-F-R: offen")
+	// }
+	// fmt.Fprintf(w, "\n")
+	// if currentWindowStatus.KuecheFensterLi == false {
+	// 	fmt.Fprintf(w, "Kue-F-L: geschlossen")
+	// } else {
+	// 	fmt.Fprintf(w, "Kue-F-L: offen")
+	// }
+	// fmt.Fprintf(w, "\n")
+	// if currentWindowStatus.KuecheFensterRe == false {
+	// 	fmt.Fprintf(w, "Kue-F-R: geschlossen")
+	// } else {
+	// 	fmt.Fprintf(w, "Kue-F-R: offen")
+	// }
 	fmt.Fprintf(w, "\n \n")
 	fmt.Fprintf(w, "Number of Packages per Sensor:")
 	fmt.Fprintf(w, "\n \n")
@@ -113,7 +115,7 @@ func Sensors(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "\n \n")
 	fmt.Fprintf(w, "Sensor Package Flow:")
 	fmt.Fprintf(w, "\n \n")
-	for _, entry := range sensorPackageFlowData[(len(sensorPackageFlowData) - 48):] {
+	for _, entry := range sensorPackageHourFlowData[(len(sensorPackageHourFlowData) - 10):] {
 		fmt.Fprintf(w, "time: %v  - ", entry.HourTimeData)
 		for s := 0; s <= entry.QuantityOfSensorPackages; s += 5 {
 			fmt.Fprintf(w, "#")
@@ -121,7 +123,16 @@ func Sensors(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, " - %v", entry.QuantityOfSensorPackages)
 		fmt.Fprintf(w, "\n")
 	}
-	//[(len(sensorPackageFlowData) - 20):]
+	fmt.Fprintf(w, "\n \n")
+	for _, entry := range sensorPackageDayFlowData { //[(len(sensorPackageDayFlowData) - 1):]
+		fmt.Fprintf(w, "time: %v  - ", entry.DayTimeData)
+		for s := 0; s <= entry.QuantityOfSensorPackages; s += 100 {
+			fmt.Fprintf(w, "#")
+		}
+		fmt.Fprintf(w, " - %v", entry.QuantityOfSensorPackages)
+		fmt.Fprintf(w, "\n")
+	}
+	//[(len(sensorPackageHourFlowData) - 20):]
 	fmt.Fprintf(w, "\n \n")
 
 }
@@ -151,10 +162,11 @@ func getLastSensorPackageDateTime() string {
 
 func initData(lastN int64) { // For Loop untli All Packets from starting Date on are received
 	currentWindowStatus = dataanalysis.WindowContactsStatus{BakerStrFensterLi: false, BakerStrFensterRe: false, KuecheFensterLi: false, KuecheFensterRe: false}
-	sensorPackageFlowData = make([]dataanalysis.SensorFlowPerHour, 0)
+	sensorPackageHourFlowData = make([]dataanalysis.SensorFlowPerHour, 0)
+	sensorPackageDayFlowData = make([]dataanalysis.SensorFlowPerDay, 0)
 	// sentPackagesPerSensor =
 	startDate := os.Getenv("START_DATE")
-	// sensorPackageFlowData[0] = dataanalysis.SensorFlowPerHour{HourTimeData: startDate, QuantityOfSensorPackages: 1}
+	// sensorPackageHourFlowData[0] = dataanalysis.SensorFlowPerHour{HourTimeData: startDate, QuantityOfSensorPackages: 1}
 	log.Printf("Load last packets from Firefly starting currently at %v", startDate)
 	endDate := getLastSensorPackageDateTime()
 	log.Printf("Current EndDate: %v", endDate)
@@ -174,11 +186,11 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 			data = append(make([]sensors.SensorData, 0))
 		} else {
 			for _, entry := range cacheData {
-				// log.Printf(" from UpdateLoop: now SensorFlowHourArray length is : %v", len(sensorPackageFlowData))
+				// log.Printf(" from UpdateLoop: now SensorFlowHourArray length is : %v", len(sensorPackageHourFlowData))
 				// currentWindowStatus = dataanalysis.WindowContactSensorsUpdate(entry, currentWindowStatus)
-				// sensorPackageFlowData = dataanalysis.SensorFlowArrayUpdate(entry, sensorPackageFlowData)
+				// sensorPackageHourFlowData = dataanalysis.SensorFlowArrayUpdate(entry, sensorPackageHourFlowData)
 				// sentPackagesPerSensor = dataanalysis.QuantifyPerSensorPackages(entry, sentPackagesPerSensor)
-				currentWindowStatus, sensorPackageFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(entry, currentWindowStatus, sensorPackageFlowData, sentPackagesPerSensor)
+				currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(entry, currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
 			}
 			startDate = cacheData[(len(cacheData) - 1)].Time
 			dateStart, _ = time.Parse(time.RFC3339, startDate)
@@ -189,7 +201,8 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 		endDate := getLastSensorPackageDateTime()
 		time.Sleep(2 * time.Second)
 		log.Printf("Check for new EndDate, now new at %v", endDate)
-		log.Printf("Length of SensorFlowArray: %v", len(sensorPackageFlowData))
+		log.Printf("Length of SensorFlowHourArray: %v", len(sensorPackageHourFlowData))
+		log.Printf("Length of SensorFlowDayArray: %v", len(sensorPackageDayFlowData))
 		time.Sleep(1 * time.Second)
 	}
 	dataInit = true
