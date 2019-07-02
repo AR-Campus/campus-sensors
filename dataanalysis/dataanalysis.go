@@ -133,7 +133,7 @@ func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsS
 	fmt.Fprintf(w, "|_                    |\n")
 	fmt.Fprintf(w, " /                    |\n")
 	fmt.Fprintf(w, "/                     |\n")
-	if currentWindowStatus.KuecheFensterLi == true {
+	if currentWindowStatus.KuecheFensterLi == false {
 		fmt.Fprintf(w, "|                  |--|\n")
 		fmt.Fprintf(w, "|           offen  |  |\n")
 		fmt.Fprintf(w, "|                  |--|\n")
@@ -146,7 +146,7 @@ func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsS
 		fmt.Fprintf(w, "|                     |\n")
 		fmt.Fprintf(w, "|                     |\n")
 	}
-	if currentWindowStatus.KuecheFensterRe == true {
+	if currentWindowStatus.KuecheFensterRe == false {
 		fmt.Fprintf(w, "|                  |--|\n")
 		fmt.Fprintf(w, "|           offen  |  |\n")
 		fmt.Fprintf(w, "|                  |--|\n")
@@ -176,7 +176,7 @@ func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsS
 	}
 	if currentWindowStatus.BakerStrFensterRe == true {
 		fmt.Fprintf(w, "    |              |--|\n")
-		fmt.Fprintf(w, "     /       offen  |  |\n")
+		fmt.Fprintf(w, "     /      offen  |  |\n")
 		fmt.Fprintf(w, "    /              |--|\n")
 		fmt.Fprintf(w, "    |                 |\n")
 		fmt.Fprintf(w, "#===#=================#\n")
