@@ -42,13 +42,13 @@ type PackagesPerSensorCount struct {
 func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus) WindowContactsStatus {
 	switch singleSensorData.DeviceID {
 	case "BakerStr-Fenster-Li":
-		currentWindowStatus.BakerStrFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
+		currentWindowStatus.BakerStrFensterLi = !singleSensorData.SensorValues["ReedSensor"].(bool)
 	case "BakerStr-Fenster-Re":
 		currentWindowStatus.BakerStrFensterRe = !singleSensorData.SensorValues["ReedSensor"].(bool)
 	case "Kueche-Fenster-Li":
-		currentWindowStatus.KuecheFensterLi = !singleSensorData.SensorValues["ReedSensor"].(bool)
+		currentWindowStatus.KuecheFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
 	case "Kueche-Fenster-Re":
-		currentWindowStatus.KuecheFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
+		currentWindowStatus.KuecheFensterRe = !singleSensorData.SensorValues["ReedSensor"].(bool)
 	}
 	return currentWindowStatus
 }
@@ -133,7 +133,7 @@ func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsS
 	fmt.Fprintf(w, "|_                    |\n")
 	fmt.Fprintf(w, " /                    |\n")
 	fmt.Fprintf(w, "/                     |\n")
-	if currentWindowStatus.KuecheFensterLi == false {
+	if currentWindowStatus.KuecheFensterLi == true {
 		fmt.Fprintf(w, "|                  |--|\n")
 		fmt.Fprintf(w, "|           offen  |  |\n")
 		fmt.Fprintf(w, "|                  |--|\n")
@@ -146,7 +146,7 @@ func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsS
 		fmt.Fprintf(w, "|                     |\n")
 		fmt.Fprintf(w, "|                     |\n")
 	}
-	if currentWindowStatus.KuecheFensterRe == false {
+	if currentWindowStatus.KuecheFensterRe == true {
 		fmt.Fprintf(w, "|                  |--|\n")
 		fmt.Fprintf(w, "|           offen  |  |\n")
 		fmt.Fprintf(w, "|                  |--|\n")
