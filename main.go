@@ -167,7 +167,7 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 	// sentPackagesPerSensor =
 	startDate := os.Getenv("START_DATE")
 	// sensorPackageHourFlowData[0] = dataanalysis.SensorFlowPerHour{HourTimeData: startDate, QuantityOfSensorPackages: 1}
-	log.Printf("Load last packets from Firefly starting currently at %v", startDate)
+	log.Printf("Load last packets from <b>Firefly</b> starting currently at %v", startDate)
 	endDate := getLastSensorPackageDateTime()
 	log.Printf("Current EndDate: %v", endDate)
 	dateStart, _ = time.Parse(time.RFC3339, startDate)

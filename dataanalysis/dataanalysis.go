@@ -42,13 +42,13 @@ type PackagesPerSensorCount struct {
 func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus) WindowContactsStatus {
 	switch singleSensorData.DeviceID {
 	case "BakerStr-Fenster-Li":
-		currentWindowStatus.BakerStrFensterLi = !singleSensorData.SensorValues["ReedSensor"].(bool)
+		currentWindowStatus.BakerStrFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
 	case "BakerStr-Fenster-Re":
-		currentWindowStatus.BakerStrFensterRe = !singleSensorData.SensorValues["ReedSensor"].(bool)
+		currentWindowStatus.BakerStrFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
 	case "Kueche-Fenster-Li":
 		currentWindowStatus.KuecheFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
 	case "Kueche-Fenster-Re":
-		currentWindowStatus.KuecheFensterRe = !singleSensorData.SensorValues["ReedSensor"].(bool)
+		currentWindowStatus.KuecheFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
 	}
 	return currentWindowStatus
 }

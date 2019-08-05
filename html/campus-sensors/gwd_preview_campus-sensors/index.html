@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html><head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8">
+  <title>Campus-Sensors</title>
+  <meta name="generator" content="Google Web Designer 5.1.1.0611">
+  <style type="text/css" id="gwd-text-style">p {
+    margin: 0px;
+}
+h1 {
+    margin: 0px;
+}
+h2 {
+    margin: 0px;
+}
+h3 {
+    margin: 0px;
+}</style>
+  <style type="text/css">html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+}
+body {
+    background-color: transparent;
+    transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    -webkit-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    -moz-transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    perspective: 1400px;
+    -webkit-perspective: 1400px;
+    -moz-perspective: 1400px;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+}
+.gwd-p-1juh {
+    position: absolute;
+    font-family: Arial;
+    font-size: 48px;
+    height: 58px;
+    transform-origin: 18.7799px 29px 0px;
+    -webkit-transform-origin: 18.7799px 29px 0px;
+    -moz-transform-origin: 18.7799px 29px 0px;
+    left: 50px;
+    top: 50px;
+    width: 450px;
+}
+.gwd-p-ykui {
+    font-family: Arial;
+}
+.gwd-div-do7j {
+    position: absolute;
+    top: 138px;
+    left: 30px;
+    width: 750px;
+    height: 400px;
+}
+.gwd-img-1jkj {
+    position: absolute;
+    width: 1000px;
+    top: 130px;
+    opacity: 1;
+    height: 450px;
+    left: 900px;
+}
+.gwd-div-a1k0 {
+    width: 800px;
+    left: 50px;
+    top: 570px;
+}
+.gwd-img-he37 {
+    position: absolute;
+    width: 83px;
+    height: 102px;
+    top: 203px;
+    left: 1293px;
+    opacity: 0;
+}
+.gwd-img-zwla {
+    position: absolute;
+    width: 58px;
+    height: 95px;
+    top: 211px;
+    opacity: 0;
+    left: 1419px;
+}
+.gwd-img-14pg {
+    position: absolute;
+    width: 58px;
+    height: 88px;
+    top: 215px;
+    opacity: 0;
+    left: 1524px;
+}
+.gwd-img-65qf {
+    position: absolute;
+    width: 63px;
+    height: 84px;
+    top: 218px;
+    opacity: 0;
+    left: 1615px;
+}
+.gwd-div-pkcu {
+    left: 50px;
+    top: 130px;
+    width: 800px;
+}
+.gwd-p-jdzv {
+    height: 346px;
+}
+.gwd-p-1tbl {
+    top: 624px;
+}
+.gwd-p-1t90 {
+    left: 900px;
+}
+.gwd-p-r9m7 {
+    top: 628px;
+}
+.gwd-p-bqol {
+    width: 1000px;
+}
+.gwd-p-nu7b {
+    height: 342px;
+}
+.gwd-p-x8ug {
+    transform-origin: 500px 171px 0px;
+    -webkit-transform-origin: 500px 171px 0px;
+    -moz-transform-origin: 500px 171px 0px;
+}
+.gwd-li-1iod {
+    font-size: 20px;
+}
+.gwd-span-105k {
+    font-size: 20px;
+}
+.gwd-span-oz8g {
+    font-size: 20px;
+}
+.gwd-span-be5m {
+    font-size: 20px;
+}</style>
+<style type="text/css">#pagedeck { overflow: hidden !important; }</style></head>
+
+<body class="htmlNoPages">
+  <h1 class="gwd-p-1juh">Campus-Sensors</h1>
+  <div class="gwd-div-do7j gwd-div-pkcu" id="TopChart">
+    <canvas id="topChart" width="800" height="400"></canvas>
+  </div>
+  <div class="gwd-div-do7j gwd-div-a1k0" id="BottomChart">
+    <canvas id="bottomChart" width="800" height="400"></canvas>
+  </div>
+  <img class="gwd-img-1jkj" src="AlleFensterZu.jpg" id="ImageBG-AllClosed">
+  <img class="gwd-img-he37" src="KF-Li-Offen.jpg" id="KF-Li-Offen">
+  <img class="gwd-img-zwla" src="KF-Re-Offen.jpg" id="KF-Re-Offen">
+  <img class="gwd-img-14pg" src="BSF-Li-Offen.jpg" id="BSF-Li-Offen">
+  <img class="gwd-img-65qf" src="BSF-Re-Offen.jpg" id="BSF-Re-Offen">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <script>
+    var ctx = document.getElementById('topChart').getContext('2d');
+    var topChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        datasets: [{
+          label: '# of Votes',
+          data: [12, 19, 3, 5, 2, 3],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+    });
+  </script>
+  <script>
+    var ctx = document.getElementById('bottomChart').getContext('2d');
+    var bottomChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Blue', 'Blue', 'Green', 'Green', 'Purple', 'Yellow'],
+        datasets: [{
+          label: '# of Votes',
+          data: [12, 19, 3, 5, 2, 3],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        }
+      }
+    });
+  </script>
+
+
+</body></html>
