@@ -245,7 +245,7 @@ func main() {
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
 	router.HandleFunc("/sensors", Sensors)
-	router.HandleFunc("/images/{image}", LoadImages)
+	router.HandleFunc("/images", LoadImages)
 
 	// router.HandleFunc("/reinit", ReInitialize).Methods("POST")
 
