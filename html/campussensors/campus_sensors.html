@@ -67,9 +67,9 @@
       position: absolute;
       width: 83px;
       height: 102px;
-      opacity: 0;
       left: 1293px;
       top: 283px;
+      opacity: 1;
     }
     .gwd-img-zwla {
       position: absolute;
@@ -260,11 +260,11 @@
   <div class="gwd-div-do7j gwd-div-a1k0" id="BottomChart">
     <canvas id="bottomChart" width="800" height="400"></canvas>
   </div>
-  <img class="gwd-img-1jkj" src="AlleFensterZu.jpg" id="ImageBG-AllClosed">
-  <img class="gwd-img-he37" src="KF-Li-Offen.jpg" id="KF-Li-Offen">
-  <img class="gwd-img-zwla" src="KF-Re-Offen.jpg" id="KF-Re-Offen">
-  <img class="gwd-img-14pg" src="BSF-Li-Offen.jpg" id="BSF-Li-Offen">
-  <img class="gwd-img-65qf" src="BSF-Re-Offen.jpg" id="BSF-Re-Offen">
+  <img class="gwd-img-1jkj" src="images/AlleFensterZu.jpg" id="ImageBG-AllClosed">
+  <img class="gwd-img-he37" src="images/KF-Li-Offen.jpg" id="KF-Li-Offen">
+  <img class="gwd-img-zwla" src="images/KF-Re-Offen.jpg" id="KF-Re-Offen">
+  <img class="gwd-img-14pg" src="images/BSF-Li-Offen.jpg" id="BSF-Li-Offen">
+  <img class="gwd-img-65qf" src="images/BSF-Re-Offen.jpg" id="BSF-Re-Offen">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   <script>
     var ctx = document.getElementById('topChart').getContext('2d');
@@ -274,7 +274,7 @@
         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
         datasets: [{
           label: '# of Votes',
-          data: [7, 10, 3, 5, 8, 10,5 ,7,6,2,5],
+          data: [7, 10, 3, 5, 8, 10, 5, 7, 6, 2, 5],
           backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
             'rgba(54, 162, 235, 0.2)',
@@ -345,10 +345,10 @@
     });
   </script>
   <span class="gwd-span-1unp">Fensterkontakte<br></span><span class="gwd-span-fvs8">Temperatur</span><span class="gwd-span-mo8g">Luftfeuchte</span><span class="gwd-span-zm9u">Helligkeit</span>
-  <img class="gwd-img-1d19" src="TuerKontakt-Icon.png">
-  <img class="gwd-img-88s2" src="Thermometer-Icon.jpg">
-  <img class="gwd-img-wn0a" src="Luftfeuchte-Icon.jpg">
-  <img class="gwd-img-3pag" src="Helligkeit-Icon.jpg"><span class="gwd-span-13yg">%</span><span class="gwd-span-1qve">4x</span><span class="gwd-span-11wc">1x</span><span class="gwd-span-158g">1x</span><span class="gwd-span-h0jc">1x</span>
+  <img class="gwd-img-1d19" src="images/TuerKontakt-Icon.png">
+  <img class="gwd-img-88s2" src="images/Thermometer-Icon.jpg">
+  <img class="gwd-img-wn0a" src="images/Luftfeuchte-Icon.jpg">
+  <img class="gwd-img-3pag" src="images/Helligkeit-Icon.jpg"><span class="gwd-span-13yg">%</span><span class="gwd-span-1qve">4x</span><span class="gwd-span-11wc">1x</span><span class="gwd-span-158g">1x</span><span class="gwd-span-h0jc">1x</span>
 </body>
 
 </html>
