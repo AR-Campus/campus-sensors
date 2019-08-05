@@ -1,17 +1,23 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"os/signal"
 	"strconv"
+	"sync"
 	"time"
 
+	"db-training.de/campus-sensors/assets"
 	"db-training.de/campus-sensors/dataanalysis"
 	"db-training.de/campus-sensors/sensors"
 	"github.com/gorilla/mux"
@@ -26,8 +32,24 @@ var currentWindowStatus dataanalysis.WindowContactsStatus
 var sensorPackageHourFlowData []dataanalysis.SensorFlowPerHour
 var sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay
 var sentPackagesPerSensor dataanalysis.PackagesPerSensorCount
+var homepageTpl *template.Template
+
+// var navigationBarHTML string
 
 var authKey = os.Getenv("FIREFLY_APIKEY")
+
+// Config provides basic configuration
+type Config struct {
+	Host         string
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+}
+
+// HTMLServer represents the web service that serves up HTML
+type HTMLServer struct {
+	server *http.Server
+	wg     sync.WaitGroup
+}
 
 func Store(w http.ResponseWriter, r *http.Request) {
 	if dataInit {
@@ -42,6 +64,16 @@ func Store(w http.ResponseWriter, r *http.Request) {
 		currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(newEntry[0], currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
 		data = append(data, newEntry...)
 	}
+}
+
+func init() { // NEW !! Testing init and if it is called by defult!!
+	log.Printf("Current CodePoint: inti-function")
+
+	// navigationBarHTML = assets.MustAssetString("html/campus-sensors/empty.html")
+
+	homepageHTML := assets.MustAssetString("html⁩/campus-sensors/campus-sensors.html")
+	homepageTpl = template.Must(template.New("homepage_view").Parse(homepageHTML))
+
 }
 
 func Infos(w http.ResponseWriter, r *http.Request) {
@@ -72,6 +104,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func Sensors(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	render(w, r, homepageTpl, "homepage_view")
+
 	fmt.Fprintf(w, "Sensordaten und Graphische Darstellungen, %q", html.EscapeString(r.URL.Path))
 	fmt.Fprintf(w, "\n \n")
 	fmt.Fprintf(w, "Current Window Status:")
@@ -167,7 +204,7 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 	// sentPackagesPerSensor =
 	startDate := os.Getenv("START_DATE")
 	// sensorPackageHourFlowData[0] = dataanalysis.SensorFlowPerHour{HourTimeData: startDate, QuantityOfSensorPackages: 1}
-	log.Printf("Load last packets from <b>Firefly</b> starting currently at %v", startDate)
+	log.Printf("Load last packets from Firefly starting currently at %v", startDate)
 	endDate := getLastSensorPackageDateTime()
 	log.Printf("Current EndDate: %v", endDate)
 	dateStart, _ = time.Parse(time.RFC3339, startDate)
@@ -209,13 +246,104 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 	log.Printf("Initialisation complete!")
 }
 
+// Start launches the HTML Server
+func Start(cfg Config) *HTMLServer {
+	// Setup Context
+	_, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Setup Handlers
+	router := mux.NewRouter()
+	router.HandleFunc("/homehandler", Sensors)
+	//router.HandleFunc("/second", SecondHandler)
+	//router.HandleFunc("/third/{number}", ThirdHandler)
+	//router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
+	// Create the HTML Server
+	htmlServer := HTMLServer{
+		server: &http.Server{
+			Addr:           cfg.Host,
+			Handler:        router,
+			ReadTimeout:    cfg.ReadTimeout,
+			WriteTimeout:   cfg.WriteTimeout,
+			MaxHeaderBytes: 1 << 20,
+		},
+	}
+
+	// Add to the WaitGroup for the listener goroutine
+	htmlServer.wg.Add(1)
+
+	// Start the listener
+	go func() {
+		fmt.Printf("\nHTMLServer : Service started : Host=%v\n", cfg.Host)
+		htmlServer.server.ListenAndServe()
+		htmlServer.wg.Done()
+	}()
+
+	return &htmlServer
+}
+
+// Stop turns off the HTML Server
+func (htmlServer *HTMLServer) Stop() error {
+	// Create a context to attempt a graceful 5 second shutdown.
+	const timeout = 5 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	fmt.Printf("\nHTMLServer : Service stopping\n")
+
+	// Attempt the graceful shutdown by closing the listener
+	// and completing all inflight requests
+	if err := htmlServer.server.Shutdown(ctx); err != nil {
+		// Looks like we timed out on the graceful shutdown. Force close.
+		if err := htmlServer.server.Close(); err != nil {
+			fmt.Printf("\nHTMLServer : Service stopping : Error=%v\n", err)
+			return err
+		}
+	}
+
+	// Wait for the listener to report that it is closed.
+	htmlServer.wg.Wait()
+	fmt.Printf("\nHTMLServer : Stopped\n")
+	return nil
+}
+
+// Render a template, or server error.
+func render(w http.ResponseWriter, r *http.Request, tpl *template.Template, name string) {
+	buf := new(bytes.Buffer)
+	data := map[string]interface{}{
+		// "NavigationBar": template.HTML(navigationBarHTML),
+	}
+	if err := tpl.ExecuteTemplate(buf, name, data); err != nil {
+		fmt.Printf("\nRender Error: %v\n", err)
+		return
+	}
+	w.Write(buf.Bytes())
+}
+
 func main() {
+
+	//___________________________________
+	serverCfg := Config{
+		Host:         "localhost:5000",
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
+	}
+	htmlServer := Start(serverCfg)
+	defer htmlServer.Stop()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	<-sigChan
+
+	fmt.Println("main : shutting down")
+	//___________________________________
 
 	router := mux.NewRouter().StrictSlash(false)
 	router.HandleFunc("/", Index)
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
-	router.HandleFunc("/sensors", Sensors)
+	//router.HandleFunc("/sensors", Sensors)
 	// router.HandleFunc("/reinit", ReInitialize).Methods("POST")
 
 	herokuPort := os.Getenv("PORT")
