@@ -71,7 +71,7 @@ func init() { // NEW !! Testing init and if it is called by defult!!
 
 	// navigationBarHTML = assets.MustAssetString("html/campus-sensors/empty.html")
 
-	homepageHTML := assets.MustAssetString("html⁩/campus-sensors/campus-sensors.html")
+	homepageHTML := assets.MustAssetString("/html⁩/campus-sensors.html")
 	homepageTpl = template.Must(template.New("homepage_view").Parse(homepageHTML))
 
 }
