@@ -23,8 +23,8 @@ type SensorFlowPerHour struct {
 }
 
 type SensorFlowPerHourPackageJson struct {
-	// HourMatrix []map[String] `json:"HourMatrix"`
-	FlowMatrix []int `json:"FlowMatrix"`
+	HourMatrix []string `json:"HourMatrix"`
+	FlowMatrix []int    `json:"FlowMatrix"`
 }
 
 type SensorFlowPerDay struct {
@@ -33,8 +33,8 @@ type SensorFlowPerDay struct {
 }
 
 type SensorFlowPerDayPackageJson struct {
-	// DayMatrix  []String `json:"DayMatrix"`
-	FlowMatrix []int `json:"FlowMatrix"`
+	DayMatrix  []string `json:"DayMatrix"`
+	FlowMatrix []int    `json:"FlowMatrix"`
 }
 
 // type SensorFlowPerMonth struct {
@@ -65,11 +65,11 @@ func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWind
 	case "KuecheFensterRe":
 		currentWindowStatus.KuecheFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
 	}
-	currentWindowStatus = WindowContactsStatus{BakerStrFensterLi: RandomBool(),
-		BakerStrFensterRe: RandomBool(),
-		KuecheFensterLi:   RandomBool(),
-		KuecheFensterRe:   RandomBool()}
-	log.Printf("WindowStatus: %v", currentWindowStatus)
+	// currentWindowStatus = WindowContactsStatus{BakerStrFensterLi: RandomBool(),
+	// 	BakerStrFensterRe: RandomBool(),
+	// 	KuecheFensterLi:   RandomBool(),
+	// 	KuecheFensterRe:   RandomBool()}
+	// log.Printf("WindowStatus: %v", currentWindowStatus)
 	return currentWindowStatus
 }
 
@@ -133,6 +133,46 @@ func QuantifyPerSensorPackages(singleSensorData sensors.SensorData, currentSenso
 		currentSensorQuantities.KuecheFensterRe++
 	}
 	return currentSensorQuantities
+}
+
+func ParseSensorFlowPerHourJson(sensorPackageFlowData []SensorFlowPerHour) SensorFlowPerHourPackageJson {
+	if len(sensorPackageFlowData) <= 24 {
+		input := sensorPackageFlowData
+		result := SensorFlowPerHourPackageJson{HourMatrix: make([]string, len(input)), FlowMatrix: make([]int, len(input))}
+		for i, entry := range input {
+			result.HourMatrix[i] = entry.HourTimeData[11:13] + ":00" // 2019-08-06T14:13:12.746280Z
+			result.FlowMatrix[i] = entry.QuantityOfSensorPackages
+		}
+		return result
+	} else {
+		input := sensorPackageFlowData[(len(sensorPackageFlowData) - 24):len(sensorPackageFlowData)]
+		result := SensorFlowPerHourPackageJson{HourMatrix: make([]string, len(input)), FlowMatrix: make([]int, len(input))}
+		for i, entry := range input {
+			result.HourMatrix[i] = entry.HourTimeData[11:13] + ":00" // 2019-08-06T14:13:12.746280Z
+			result.FlowMatrix[i] = entry.QuantityOfSensorPackages
+		}
+		return result
+	}
+}
+
+func ParseSensorFlowPerDayJson(sensorPackageFlowData []SensorFlowPerDay) SensorFlowPerDayPackageJson {
+	if len(sensorPackageFlowData) <= 14 {
+		input := sensorPackageFlowData
+		result := SensorFlowPerDayPackageJson{DayMatrix: make([]string, len(input)), FlowMatrix: make([]int, len(input))}
+		for i, entry := range input {
+			result.DayMatrix[i] = entry.DayTimeData[8:10] + "." + entry.DayTimeData[5:7] // 2019-08-06T14:13:12.746280Z
+			result.FlowMatrix[i] = entry.QuantityOfSensorPackages
+		}
+		return result
+	} else {
+		input := sensorPackageFlowData[(len(sensorPackageFlowData) - 14):len(sensorPackageFlowData)]
+		result := SensorFlowPerDayPackageJson{DayMatrix: make([]string, len(input)), FlowMatrix: make([]int, len(input))}
+		for i, entry := range input {
+			result.DayMatrix[i] = entry.DayTimeData[8:10] + "." + entry.DayTimeData[5:7] // 2019-08-06T14:13:12.746280Z
+			result.FlowMatrix[i] = entry.QuantityOfSensorPackages
+		}
+		return result
+	}
 }
 
 func UpdateAnalysisData(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus, sensorPackageHourFlowData []SensorFlowPerHour, sensorPackageDayFlowData []SensorFlowPerDay, currentSensorQuantities PackagesPerSensorCount) (WindowContactsStatus, []SensorFlowPerHour, []SensorFlowPerDay, PackagesPerSensorCount) {

@@ -1,20 +1,18 @@
 var ctx = document.getElementById('bottomChart').getContext('2d');
-var bottomChart = new Chart(ctx, {
+var bottomChartJS = new Chart(ctx, {
   type: 'line',
   data: {
-    // labels: [''],
+    labels: [1500,1600,1700,1750,1800,1850,1900,1950,1999,2050],
     datasets: [{
       label: 'Sensor Packages per Day',
-      data: [
-        {x: 0 , y: 3},
-        {x: 1 , y: 8}
-      ],
+      data: [282,350,411,502,635,809,947,1402,3700,5267],
       backgroundColor: [
         'rgba(54, 162, 235, 0.2)'
       ],
       borderColor: [
         'rgba(54, 162, 235, 1)'
       ],
+      fill: true,
       borderWidth: 1
     }]
   },

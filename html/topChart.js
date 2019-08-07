@@ -1,14 +1,11 @@
 var ctx = document.getElementById('topChart').getContext('2d');
-var topChart = new Chart(ctx, {
+var topChartJS = new Chart(ctx, {
   type: 'line',
   data: {
-    // labels: [''],
+    labels: [1500,1600,1700,1750,1800,1850,1900,1950,1999,2050],
     datasets: [{
       label: 'Sensor Packages per Hour',
-      data: [
-        {x: 0 , y: 3},
-        {x: 1 , y: 8}
-      ],
+      data: [282,350,411,502,635,809,947,1402,3700,5267],
       backgroundColor: [
         'rgba(255, 99, 132, 0.2)',
       ],

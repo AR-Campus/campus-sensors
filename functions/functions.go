@@ -46,7 +46,7 @@ func UpdateWindowsFrontEndData(currentWindowStatus dataanalysis.WindowContactsSt
 }
 
 func UpdateTopChartFrontEndData(sensorPackageHourFlowData []dataanalysis.SensorFlowPerHour, w http.ResponseWriter, r *http.Request) {
-	payload, err := json.Marshal(sensorPackageHourFlowData)
+	payload, err := json.Marshal(dataanalysis.ParseSensorFlowPerHourJson(sensorPackageHourFlowData))
 	if err != nil {
 		log.Println(err)
 	}
@@ -56,7 +56,7 @@ func UpdateTopChartFrontEndData(sensorPackageHourFlowData []dataanalysis.SensorF
 }
 
 func UpdateBottomChartFrontEndData(sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay, w http.ResponseWriter, r *http.Request) {
-	payload, err := json.Marshal(sensorPackageDayFlowData)
+	payload, err := json.Marshal(dataanalysis.ParseSensorFlowPerDayJson(sensorPackageDayFlowData))
 	if err != nil {
 		log.Println(err)
 	}
