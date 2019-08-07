@@ -13,6 +13,7 @@ type SensorInfo struct {
 
 type SensorData struct {
 	DeviceID     string                 `json:"device_id"`
+	DeviceType   string                 `json:"device_type"`
 	Time         string                 `json:"time"`
 	SensorValues map[string]interface{} `json:"sensor_values"`
 }
@@ -35,15 +36,15 @@ type FireFlySingle struct {
 func corelateDevIDtoName(deviceID string) string {
 	switch deviceID {
 	case "A81758FFFE031A09":
-		return "Kueche-Temp-Humid-Licht"
+		return "KuecheTempHumidLicht"
 	case "0E7E34643331041C":
-		return "Kueche-Fenster-Li"
+		return "KuecheFensterLi"
 	case "0E7E34643331041D":
-		return "Kueche-Fenster-Re"
+		return "KuecheFensterRe"
 	case "0E7E346433310415":
-		return "BakerStr-Fenster-Li"
+		return "BakerStrFensterLi"
 	case "0E7E346433310418":
-		return "BakerStr-Fenster-Re"
+		return "BakerStrFensterRe"
 		// case "":
 		// 	return ""
 		// case "":
@@ -58,7 +59,27 @@ func ConvertSensorType(sensorInfoTypeArray []SensorInfo) []SensorData {
 	result := make([]SensorData, len(sensorInfoTypeArray))
 	for i, entry := range sensorInfoTypeArray {
 		// time, _ := time.Parse(time.RFC3339, entry.GWRX[0]["time"].(string))
-		result[i] = SensorData{DeviceID: corelateDevIDtoName(entry.Device_EUI), Time: entry.GWRX[0]["time"].(string), SensorValues: entry.Parsed}
+		result[i] = SensorData{DeviceID: corelateDevIDtoName(entry.Device_EUI), DeviceType: "", Time: entry.GWRX[0]["time"].(string), SensorValues: entry.Parsed}
+		switch result[i].DeviceID {
+		case "KuecheTempHumidLicht":
+			result[i].DeviceType = "KuecheKombi"
+		case "KuecheFensterLi":
+			result[i].DeviceType = "FensterKontakt"
+		case "KuecheFensterRe":
+			result[i].DeviceType = "FensterKontakt"
+		case "BakerStrFensterLi":
+			result[i].DeviceType = "FensterKontakt"
+		case "BakerStrFensterRe":
+			result[i].DeviceType = "FensterKontakt"
+			// case "":
+			// 	return ""
+			// case "":
+			// 	return ""
+			// case "":
+			// 	return ""
+		default:
+			result[i].DeviceType = "NotClassified"
+		}
 	}
 	return result
 }

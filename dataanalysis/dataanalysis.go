@@ -55,6 +55,8 @@ func RandomBool() bool {
 }
 
 func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus) WindowContactsStatus {
+	log.Printf("SingleSensorData.Sensorvalues: %v", singleSensorData.SensorValues)
+	log.Printf("SingleSensorData.Sensorvalues[ReedSensor]: %v", singleSensorData.SensorValues["ReedSensor"])
 	switch singleSensorData.DeviceID {
 	case "BakerStrFensterLi":
 		currentWindowStatus.BakerStrFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
@@ -70,6 +72,7 @@ func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWind
 	// 	KuecheFensterLi:   RandomBool(),
 	// 	KuecheFensterRe:   RandomBool()}
 	// log.Printf("WindowStatus: %v", currentWindowStatus)
+	log.Printf("CurrentWindowStatus: %v", currentWindowStatus)
 	return currentWindowStatus
 }
 
@@ -177,7 +180,9 @@ func ParseSensorFlowPerDayJson(sensorPackageFlowData []SensorFlowPerDay) SensorF
 
 func UpdateAnalysisData(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus, sensorPackageHourFlowData []SensorFlowPerHour, sensorPackageDayFlowData []SensorFlowPerDay, currentSensorQuantities PackagesPerSensorCount) (WindowContactsStatus, []SensorFlowPerHour, []SensorFlowPerDay, PackagesPerSensorCount) {
 	// log.Printf("From UpdateFunc: now SensorFlowHourArray length is : %v", len(sensorPackageFlowData))
-	currentWindowStatus = WindowContactSensorsUpdate(singleSensorData, currentWindowStatus)
+	if singleSensorData.DeviceType == "FensterKontakt" {
+		currentWindowStatus = WindowContactSensorsUpdate(singleSensorData, currentWindowStatus)
+	}
 	sensorPackageHourFlowData = SensorFlowHourArrayUpdate(singleSensorData, sensorPackageHourFlowData)
 	sensorPackageDayFlowData = SensorFlowDayArrayUpdate(singleSensorData, sensorPackageDayFlowData)
 	currentSensorQuantities = QuantifyPerSensorPackages(singleSensorData, currentSensorQuantities)

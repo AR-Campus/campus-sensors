@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"strconv"
 	"sync"
 	"time"
 
@@ -60,6 +59,7 @@ func Store(w http.ResponseWriter, r *http.Request) {
 		result, _ := ioutil.ReadAll(r.Body)
 		newEntry := sensors.ConvertSingle(string(result))
 		currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(newEntry[0], currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
+		log.Printf("/Store newWindowStatus?: %v", currentWindowStatus)
 		data = append(data, newEntry...)
 	}
 }
@@ -100,7 +100,7 @@ func getLastSensorPackageDateTime() string {
 	return cacheData[0].Time
 }
 
-func initData(lastN int64) { // For Loop untli All Packets from starting Date on are received
+func initData() { // For Loop untli All Packets from starting Date on are received
 	currentWindowStatus = dataanalysis.WindowContactsStatus{BakerStrFensterLi: false, BakerStrFensterRe: false, KuecheFensterLi: false, KuecheFensterRe: false}
 	sensorPackageHourFlowData = make([]dataanalysis.SensorFlowPerHour, 0)
 	sensorPackageDayFlowData = make([]dataanalysis.SensorFlowPerDay, 0)
@@ -125,6 +125,7 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 		} else {
 			for _, entry := range cacheData {
 				currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(entry, currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
+				log.Printf("initData update windowStatus?: %v from %v", currentWindowStatus, entry)
 			}
 			startDate = cacheData[(len(cacheData) - 1)].Time
 			dateStart, _ = time.Parse(time.RFC3339, startDate)
@@ -165,12 +166,7 @@ func main() {
 	} else {
 		port = ":" + herokuPort
 	}
-	var lastN int64
-	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
-	if err != nil {
-		lastN = 10
-	}
-	go initData(lastN)
+	go initData()
 
 	log.Print("Starting server at: ", port)
 	log.Fatal(http.ListenAndServe(port, router))

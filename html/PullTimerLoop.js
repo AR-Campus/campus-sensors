@@ -66,7 +66,7 @@ function timerLoop()
 {
   // console.log("PullTimerLoop-File exec");
   updateWindowsVar = JSON.parse(httpGet("updatewindows"));
-  // console.log(updateWindowsVar);
+  console.log(updateWindowsVar);
   updateWindows(updateWindowsVar);
   updateTopChartVar = JSON.parse(httpGet("updatetopchart"));
   updateTopChart(updateTopChartVar);
