@@ -3,6 +3,7 @@ package dataanalysis
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -10,20 +11,30 @@ import (
 )
 
 type WindowContactsStatus struct {
-	BakerStrFensterLi bool `json:"BakerStr-Fenster-Li"`
-	BakerStrFensterRe bool `json:"BakerStr-Fenster-Re"`
-	KuecheFensterLi   bool `json:"Kueche-Fenster-Li"`
-	KuecheFensterRe   bool `json:"Kueche-Fenster-Re"`
+	BakerStrFensterLi bool `json:"BakerStrFensterLi"`
+	BakerStrFensterRe bool `json:"BakerStrFensterRe"`
+	KuecheFensterLi   bool `json:"KuecheFensterLi"`
+	KuecheFensterRe   bool `json:"KuecheFensterRe"`
 }
 
 type SensorFlowPerHour struct {
-	HourTimeData             string `json:"Hour-Time-Data"`
-	QuantityOfSensorPackages int    `json:"Quantity-Of-Sensor-Packages"`
+	HourTimeData             string `json:"HourTimeData"`
+	QuantityOfSensorPackages int    `json:"QuantityOfSensorPackages"`
+}
+
+type SensorFlowPerHourPackageJson struct {
+	// HourMatrix []map[String] `json:"HourMatrix"`
+	FlowMatrix []int `json:"FlowMatrix"`
 }
 
 type SensorFlowPerDay struct {
-	DayTimeData              string `json:"Hour-Time-Data"`
-	QuantityOfSensorPackages int    `json:"Quantity-Of-Sensor-Packages"`
+	DayTimeData              string `json:"DayTimeData"`
+	QuantityOfSensorPackages int    `json:"QuantityOfSensorPackages"`
+}
+
+type SensorFlowPerDayPackageJson struct {
+	// DayMatrix  []String `json:"DayMatrix"`
+	FlowMatrix []int `json:"FlowMatrix"`
 }
 
 // type SensorFlowPerMonth struct {
@@ -32,24 +43,33 @@ type SensorFlowPerDay struct {
 // }
 
 type PackagesPerSensorCount struct {
-	KuecheTempHumidLicht int64 `json:"Kueche-Temp-Humid-Licht"`
-	BakerStrFensterLi    int64 `json:"BakerStr-Fenster-Li"`
-	BakerStrFensterRe    int64 `json:"BakerStr-Fenster-Re"`
-	KuecheFensterLi      int64 `json:"Kueche-Fenster-Li"`
-	KuecheFensterRe      int64 `json:"Kueche-Fenster-Re"`
+	KuecheTempHumidLicht int64 `json:"KuecheTempHumidLicht"`
+	BakerStrFensterLi    int64 `json:"BakerStrFensterLi"`
+	BakerStrFensterRe    int64 `json:"BakerStrFensterRe"`
+	KuecheFensterLi      int64 `json:"KuecheFensterLi"`
+	KuecheFensterRe      int64 `json:"KuecheFensterRe"`
+}
+
+func RandomBool() bool {
+	return rand.Intn(2) == 0
 }
 
 func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus) WindowContactsStatus {
 	switch singleSensorData.DeviceID {
-	case "BakerStr-Fenster-Li":
+	case "BakerStrFensterLi":
 		currentWindowStatus.BakerStrFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
-	case "BakerStr-Fenster-Re":
+	case "BakerStrFensterRe":
 		currentWindowStatus.BakerStrFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
-	case "Kueche-Fenster-Li":
+	case "KuecheFensterLi":
 		currentWindowStatus.KuecheFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
-	case "Kueche-Fenster-Re":
+	case "KuecheFensterRe":
 		currentWindowStatus.KuecheFensterRe = singleSensorData.SensorValues["ReedSensor"].(bool)
 	}
+	currentWindowStatus = WindowContactsStatus{BakerStrFensterLi: RandomBool(),
+		BakerStrFensterRe: RandomBool(),
+		KuecheFensterLi:   RandomBool(),
+		KuecheFensterRe:   RandomBool()}
+	log.Printf("WindowStatus: %v", currentWindowStatus)
 	return currentWindowStatus
 }
 
@@ -101,15 +121,15 @@ func SensorFlowDayArrayUpdate(singleSensorData sensors.SensorData, sensorPackage
 
 func QuantifyPerSensorPackages(singleSensorData sensors.SensorData, currentSensorQuantities PackagesPerSensorCount) PackagesPerSensorCount {
 	switch singleSensorData.DeviceID {
-	case "Kueche-Temp-Humid-Licht":
+	case "KuecheTempHumidLicht":
 		currentSensorQuantities.KuecheTempHumidLicht++
-	case "BakerStr-Fenster-Li":
+	case "BakerStrFensterLi":
 		currentSensorQuantities.BakerStrFensterLi++
-	case "BakerStr-Fenster-Re":
+	case "BakerStrFensterRe":
 		currentSensorQuantities.BakerStrFensterRe++
-	case "Kueche-Fenster-Li":
+	case "KuecheFensterLi":
 		currentSensorQuantities.KuecheFensterLi++
-	case "Kueche-Fenster-Re":
+	case "KuecheFensterRe":
 		currentSensorQuantities.KuecheFensterRe++
 	}
 	return currentSensorQuantities
@@ -128,7 +148,7 @@ func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsS
 	fmt.Fprintf(w, "#=====================#\n")
 	fmt.Fprintf(w, "|_______|             |\n")
 	fmt.Fprintf(w, "|  |                  |\n")
-	fmt.Fprintf(w, "|  |      KÜCHE       |\n")
+	fmt.Fprintf(w, "|  |      <b>KÜCHE       |\n")
 	fmt.Fprintf(w, "|__|                  |\n")
 	fmt.Fprintf(w, "|_                    |\n")
 	fmt.Fprintf(w, " /                    |\n")

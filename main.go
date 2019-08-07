@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"html"
 	"html/template"
@@ -15,6 +14,7 @@ import (
 	"time"
 
 	"db-training.de/campus-sensors/dataanalysis"
+	"db-training.de/campus-sensors/functions"
 	"db-training.de/campus-sensors/sensors"
 	"github.com/gorilla/mux"
 )
@@ -26,7 +26,9 @@ var dateStart time.Time
 var dateEnd time.Time
 var currentWindowStatus dataanalysis.WindowContactsStatus
 var sensorPackageHourFlowData []dataanalysis.SensorFlowPerHour
+var sensorPackageHourFlowJson dataanalysis.SensorFlowPerHourPackageJson
 var sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay
+var sensorPackageDayFlowJson dataanalysis.SensorFlowPerHourPackageJson
 var sentPackagesPerSensor dataanalysis.PackagesPerSensorCount
 var homepageTpl *template.Template
 
@@ -63,118 +65,28 @@ func Store(w http.ResponseWriter, r *http.Request) {
 }
 
 func Infos(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Get data")
-	dataLen := len(data)
-	intervalShown := 10
-	fmt.Fprintf(w, "Sensordaten in der Pseudo-Datenbank: %v, %q", dataLen, html.EscapeString(r.URL.Path))
-	fmt.Fprintf(w, "\n \n")
-	fmt.Fprintf(w, "First %v Entries:", intervalShown)
-	fmt.Fprintf(w, "\n")
-	beginning := data[:intervalShown]
-	json.NewEncoder(w).Encode(beginning)
-	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "Last %v Entries:", intervalShown)
-	fmt.Fprintf(w, "\n")
-	dataend := data[(dataLen - intervalShown):]
-	json.NewEncoder(w).Encode(dataend)
-	fmt.Fprintf(w, "\n \n")
-	if dataInit {
-		fmt.Fprintf(w, "Initialisation complete!")
-	} else {
-		fmt.Fprintf(w, "Initialisation running!")
-	}
+	functions.DisplayInfos(data, dataInit, w, r)
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 }
 
-func LoadImages(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	ImageFileRequestName := vars["image"]
-	http.Handle(ImageFileRequestName, http.StripPrefix("/images/", http.FileServer(http.Dir("./html/campussensors/"))))
-	http.ListenAndServe(":8080", nil)
-	log.Println("Served Image after request")
-}
-
 func Sensors(w http.ResponseWriter, r *http.Request) {
-
-	http.ServeFile(w, r, "html/campussensors/campus_sensors.html")
-
-	fmt.Fprintf(w, "Sensordaten und Graphische Darstellungen, %q", html.EscapeString(r.URL.Path))
-	fmt.Fprintf(w, "\n \n")
-	fmt.Fprintf(w, "Current Window Status:")
-	fmt.Fprintf(w, "\n \n")
-	dataanalysis.DrawWindowStatus(w, currentWindowStatus)
-	// if currentWindowStatus.BakerStrFensterLi == false {
-	// 	fmt.Fprintf(w, "BStr-F-L: geschlossen")
-	// } else {
-	// 	fmt.Fprintf(w, "BStr-F-L: offen")
-	// }
-	// fmt.Fprintf(w, "\n")
-	// if currentWindowStatus.BakerStrFensterRe == false {
-	// 	fmt.Fprintf(w, "BStr-F-R: geschlossen")
-	// } else {
-	// 	fmt.Fprintf(w, "BStr-F-R: offen")
-	// }
-	// fmt.Fprintf(w, "\n")
-	// if currentWindowStatus.KuecheFensterLi == false {
-	// 	fmt.Fprintf(w, "Kue-F-L: geschlossen")
-	// } else {
-	// 	fmt.Fprintf(w, "Kue-F-L: offen")
-	// }
-	// fmt.Fprintf(w, "\n")
-	// if currentWindowStatus.KuecheFensterRe == false {
-	// 	fmt.Fprintf(w, "Kue-F-R: geschlossen")
-	// } else {
-	// 	fmt.Fprintf(w, "Kue-F-R: offen")
-	// }
-	fmt.Fprintf(w, "\n \n")
-	fmt.Fprintf(w, "Number of Packages per Sensor:")
-	fmt.Fprintf(w, "\n \n")
-	fmt.Fprintf(w, "KueTHL:   %v", sentPackagesPerSensor.KuecheTempHumidLicht)
-	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "BStr-F-L: %v", sentPackagesPerSensor.BakerStrFensterLi)
-	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "BStr-F-R: %v", sentPackagesPerSensor.BakerStrFensterRe)
-	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "Kue-F-L:  %v", sentPackagesPerSensor.KuecheFensterLi)
-	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "Kue-F-R:  %v", sentPackagesPerSensor.KuecheFensterRe)
-	fmt.Fprintf(w, "\n \n")
-	fmt.Fprintf(w, "Sensor Package Flow:")
-	fmt.Fprintf(w, "\n \n")
-	for _, entry := range sensorPackageHourFlowData[(len(sensorPackageHourFlowData) - 10):] {
-		fmt.Fprintf(w, "time: %v  - ", entry.HourTimeData)
-		for s := 0; s <= entry.QuantityOfSensorPackages; s += 5 {
-			fmt.Fprintf(w, "#")
-		}
-		fmt.Fprintf(w, " - %v", entry.QuantityOfSensorPackages)
-		fmt.Fprintf(w, "\n")
-	}
-	fmt.Fprintf(w, "\n \n")
-	for _, entry := range sensorPackageDayFlowData { //[(len(sensorPackageDayFlowData) - 1):]
-		fmt.Fprintf(w, "time: %v  - ", entry.DayTimeData)
-		for s := 0; s <= entry.QuantityOfSensorPackages; s += 100 {
-			fmt.Fprintf(w, "#")
-		}
-		fmt.Fprintf(w, " - %v", entry.QuantityOfSensorPackages)
-		fmt.Fprintf(w, "\n")
-	}
-	//[(len(sensorPackageHourFlowData) - 20):]
-	fmt.Fprintf(w, "\n \n")
-
+	http.ServeFile(w, r, "html/campus_sensors.html")
 }
 
-// func ReInitialize(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprintf(w, "Sensordaten mit aktueller Anzahl an Sensordaten aus GetEnv in x100, %q", html.EscapeString(r.URL.Path))
-// 	var lastN int64
-// 	lastN, err := strconv.ParseInt(os.Getenv("NUMBER_OF_FIREFLY_ROWS"), 10, 64)
-// 	if err != nil {
-// 		lastN = 10
-// 	}
-// 	go initData(lastN)
-// }
+func UpdateWindowsFrontEnd(w http.ResponseWriter, r *http.Request) {
+	functions.UpdateWindowsFrontEndData(currentWindowStatus, w, r)
+}
+
+func UpdateTopChartFrontEnd(w http.ResponseWriter, r *http.Request) {
+	functions.UpdateTopChartFrontEndData(sensorPackageHourFlowData, w, r)
+}
+
+func UpdateBottomChartFrontEnd(w http.ResponseWriter, r *http.Request) {
+	functions.UpdateBottomChartFrontEndData(sensorPackageDayFlowData, w, r)
+}
 
 func getLastSensorPackageDateTime() string {
 	FireFlyURL := fmt.Sprintf("https://api.fireflyiot.com/api/v1/packets?auth=%v&limit_to_last=1", authKey)
@@ -185,7 +97,6 @@ func getLastSensorPackageDateTime() string {
 	}
 	responseData, _ := ioutil.ReadAll(response.Body)
 	cacheData = sensors.ConvertInfos(string(responseData))
-	// fmt.Println(cacheData)
 	return cacheData[0].Time
 }
 
@@ -193,9 +104,7 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 	currentWindowStatus = dataanalysis.WindowContactsStatus{BakerStrFensterLi: false, BakerStrFensterRe: false, KuecheFensterLi: false, KuecheFensterRe: false}
 	sensorPackageHourFlowData = make([]dataanalysis.SensorFlowPerHour, 0)
 	sensorPackageDayFlowData = make([]dataanalysis.SensorFlowPerDay, 0)
-	// sentPackagesPerSensor =
 	startDate := os.Getenv("START_DATE")
-	// sensorPackageHourFlowData[0] = dataanalysis.SensorFlowPerHour{HourTimeData: startDate, QuantityOfSensorPackages: 1}
 	log.Printf("Load last packets from Firefly starting currently at %v", startDate)
 	endDate := getLastSensorPackageDateTime()
 	log.Printf("Current EndDate: %v", endDate)
@@ -215,10 +124,6 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 			data = append(make([]sensors.SensorData, 0))
 		} else {
 			for _, entry := range cacheData {
-				// log.Printf(" from UpdateLoop: now SensorFlowHourArray length is : %v", len(sensorPackageHourFlowData))
-				// currentWindowStatus = dataanalysis.WindowContactSensorsUpdate(entry, currentWindowStatus)
-				// sensorPackageHourFlowData = dataanalysis.SensorFlowArrayUpdate(entry, sensorPackageHourFlowData)
-				// sentPackagesPerSensor = dataanalysis.QuantifyPerSensorPackages(entry, sentPackagesPerSensor)
 				currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(entry, currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
 			}
 			startDate = cacheData[(len(cacheData) - 1)].Time
@@ -241,13 +146,14 @@ func initData(lastN int64) { // For Loop untli All Packets from starting Date on
 func main() {
 
 	router := mux.NewRouter().StrictSlash(false)
-	router.HandleFunc("/", Index)
+	// router.HandleFunc("/", Index)
 	router.HandleFunc("/store", Store)
 	router.HandleFunc("/infos", Infos)
 	router.HandleFunc("/sensors", Sensors)
-	router.HandleFunc("/images", LoadImages)
-
-	// router.HandleFunc("/reinit", ReInitialize).Methods("POST")
+	router.HandleFunc("/updatewindows", UpdateWindowsFrontEnd)
+	router.HandleFunc("/updatetopchart", UpdateTopChartFrontEnd)
+	router.HandleFunc("/updatebottomchart", UpdateBottomChartFrontEnd)
+	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("html/"))))
 
 	herokuPort := os.Getenv("PORT")
 	if herokuPort == "" {
