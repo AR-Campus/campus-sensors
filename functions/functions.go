@@ -55,8 +55,20 @@ func UpdateTopChartFrontEndData(sensorPackageHourFlowData []dataanalysis.SensorF
 	return
 }
 
-func UpdateBottomChartFrontEndData(sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay, w http.ResponseWriter, r *http.Request) {
-	payload, err := json.Marshal(dataanalysis.ParseSensorFlowPerDayJson(sensorPackageDayFlowData))
+// UPDATE FLOW PER DAY
+// func UpdateBottomChartFrontEndData(sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay, w http.ResponseWriter, r *http.Request) {
+// 	payload, err := json.Marshal(dataanalysis.ParseSensorFlowPerDayJson(sensorPackageDayFlowData))
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Write(payload)
+// 	return
+// }
+
+// UPDATE TEMP OVER TIME
+func UpdateBottomChartFrontEndData(temperaturePackageFlowData []dataanalysis.TemperatureFlowPerHour, w http.ResponseWriter, r *http.Request) {
+	payload, err := json.Marshal(dataanalysis.ParseTemperatureFlowPerHourJson(temperaturePackageFlowData))
 	if err != nil {
 		log.Println(err)
 	}

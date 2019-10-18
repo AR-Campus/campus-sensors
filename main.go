@@ -27,8 +27,9 @@ var currentWindowStatus dataanalysis.WindowContactsStatus
 var sensorPackageHourFlowData []dataanalysis.SensorFlowPerHour
 var sensorPackageHourFlowJson dataanalysis.SensorFlowPerHourPackageJson
 var sensorPackageDayFlowData []dataanalysis.SensorFlowPerDay
-var sensorPackageDayFlowJson dataanalysis.SensorFlowPerHourPackageJson
+var sensorPackageDayFlowJson dataanalysis.SensorFlowPerDayPackageJson
 var sentPackagesPerSensor dataanalysis.PackagesPerSensorCount
+var temperatureFlowHourData []dataanalysis.TemperatureFlowPerHour
 var homepageTpl *template.Template
 
 // var navigationBarHTML string
@@ -58,8 +59,8 @@ func Store(w http.ResponseWriter, r *http.Request) {
 
 		result, _ := ioutil.ReadAll(r.Body)
 		newEntry := sensors.ConvertSingle(string(result))
-		currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(newEntry[0], currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
-		log.Printf("/Store newWindowStatus?: %v", currentWindowStatus)
+		currentWindowStatus, temperatureFlowHourData, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(newEntry[0], currentWindowStatus, temperatureFlowHourData, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
+		// log.Printf("/Store newWindowStatus?: %v", currentWindowStatus)
 		data = append(data, newEntry...)
 	}
 }
@@ -85,7 +86,8 @@ func UpdateTopChartFrontEnd(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateBottomChartFrontEnd(w http.ResponseWriter, r *http.Request) {
-	functions.UpdateBottomChartFrontEndData(sensorPackageDayFlowData, w, r)
+	// functions.UpdateBottomChartFrontEndData(sensorPackageDayFlowData, w, r) // Packages Per Day
+	functions.UpdateBottomChartFrontEndData(temperatureFlowHourData, w, r) // Temperature over Time
 }
 
 func getLastSensorPackageDateTime() string {
@@ -124,8 +126,8 @@ func initData() { // For Loop untli All Packets from starting Date on are receiv
 			data = append(make([]sensors.SensorData, 0))
 		} else {
 			for _, entry := range cacheData {
-				currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(entry, currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
-				log.Printf("initData update windowStatus?: %v from %v", currentWindowStatus, entry)
+				currentWindowStatus, temperatureFlowHourData, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor = dataanalysis.UpdateAnalysisData(entry, currentWindowStatus, temperatureFlowHourData, sensorPackageHourFlowData, sensorPackageDayFlowData, sentPackagesPerSensor)
+				// log.Printf("initData update windowStatus?: %v from %v", currentWindowStatus, entry)
 			}
 			startDate = cacheData[(len(cacheData) - 1)].Time
 			dateStart, _ = time.Parse(time.RFC3339, startDate)
@@ -133,11 +135,11 @@ func initData() { // For Loop untli All Packets from starting Date on are receiv
 			data = append(data, cacheData[:(len(cacheData)-1)]...)
 			log.Printf("DataBase current size: %v", len(data))
 		}
-		endDate := getLastSensorPackageDateTime()
+		// endDate := getLastSensorPackageDateTime()
 		time.Sleep(2 * time.Second)
-		log.Printf("Check for new EndDate, now new at %v", endDate)
-		log.Printf("Length of SensorFlowHourArray: %v", len(sensorPackageHourFlowData))
-		log.Printf("Length of SensorFlowDayArray: %v", len(sensorPackageDayFlowData))
+		// log.Printf("Check for new EndDate, now new at %v", endDate)
+		// log.Printf("Length of SensorFlowHourArray: %v", len(sensorPackageHourFlowData))
+		// log.Printf("Length of SensorFlowDayArray: %v", len(sensorPackageDayFlowData))
 		time.Sleep(1 * time.Second)
 	}
 	dataInit = true

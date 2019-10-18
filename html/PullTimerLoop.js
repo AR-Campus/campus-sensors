@@ -34,7 +34,7 @@ var bottomChartJS = new Chart(ctx, {
   data: {
     labels: ["no Data available yet"],
     datasets: [{
-      label: 'Sensor Packages per Day',
+      label: 'Temperature',
       data: [314],
       backgroundColor: [
         'rgba(54, 162, 235, 0.2)'
@@ -71,7 +71,7 @@ function timerLoop()
   updateTopChartVar = JSON.parse(httpGet("updatetopchart"));
   updateTopChart(updateTopChartVar);
   updateBottomChartVar = JSON.parse(httpGet("updatebottomchart"));
-  updateBottomChart("bottomChart", updateBottomChartVar);
+  updateBottomChart(updateBottomChartVar);
 }
 
 
@@ -125,10 +125,19 @@ function updateTopChart(updateTopChart)
   topChartJS.update();
 }
 
-function updateBottomChart(chart, updateBottomChart)
+// // UPDATE Packages Per Day
+// function updateBottomChart(chart, updateBottomChart)
+// {
+//   bottomChartJS.data.labels = updateBottomChart.DayMatrix;
+//   bottomChartJS.data.datasets[0].data = updateBottomChart.FlowMatrix;
+//   bottomChartJS.update();
+// }
+
+// UPDATE TempFlow Per Hour
+function updateBottomChart(updateBottomChart)
 {
-  bottomChartJS.data.labels = updateBottomChart.DayMatrix;
-  bottomChartJS.data.datasets[0].data = updateBottomChart.FlowMatrix;
+  bottomChartJS.data.labels = updateBottomChart.HourMatrix;
+  bottomChartJS.data.datasets[0].data = updateBottomChart.TemperatureMatrix;
   bottomChartJS.update();
 }
 

@@ -37,6 +37,17 @@ type SensorFlowPerDayPackageJson struct {
 	FlowMatrix []int    `json:"FlowMatrix"`
 }
 
+type TemperatureFlowPerHour struct {
+	HourTimeData      string  `json:"HourTimeData"`
+	TemperatureSum    float64 `json:"TemperatureSum"`
+	QuantitiyOfEntrys float64 `json:"QuantitiyOfEntrys"`
+}
+
+type TemperatureFlowPerHourPackageJson struct {
+	HourMatrix        []string  `json:"HourMatrix"`
+	TemperatureMatrix []float64 `json:"TemperatureMatrix"`
+}
+
 // type SensorFlowPerMonth struct {
 // 	MonthTimeData            string `json:"Hour-Time-Data"`
 // 	QuantityOfSensorPackages int    `json:"Quantity-Of-Sensor-Packages"`
@@ -55,8 +66,8 @@ func RandomBool() bool {
 }
 
 func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus) WindowContactsStatus {
-	log.Printf("SingleSensorData.Sensorvalues: %v", singleSensorData.SensorValues)
-	log.Printf("SingleSensorData.Sensorvalues[ReedSensor]: %v", singleSensorData.SensorValues["ReedSensor"])
+	// log.Printf("SingleSensorData.Sensorvalues: %v", singleSensorData.SensorValues)
+	// log.Printf("SingleSensorData.Sensorvalues[ReedSensor]: %v", singleSensorData.SensorValues["ReedSensor"])
 	switch singleSensorData.DeviceID {
 	case "BakerStrFensterLi":
 		currentWindowStatus.BakerStrFensterLi = singleSensorData.SensorValues["ReedSensor"].(bool)
@@ -72,7 +83,7 @@ func WindowContactSensorsUpdate(singleSensorData sensors.SensorData, currentWind
 	// 	KuecheFensterLi:   RandomBool(),
 	// 	KuecheFensterRe:   RandomBool()}
 	// log.Printf("WindowStatus: %v", currentWindowStatus)
-	log.Printf("CurrentWindowStatus: %v", currentWindowStatus)
+	// log.Printf("CurrentWindowStatus: %v", currentWindowStatus)
 	return currentWindowStatus
 }
 
@@ -122,6 +133,31 @@ func SensorFlowDayArrayUpdate(singleSensorData sensors.SensorData, sensorPackage
 	return sensorPackageFlowData
 }
 
+func TemperatureFlowHourArrayUpdate(singleSensorData sensors.SensorData, temperaturePackageFlowData []TemperatureFlowPerHour) []TemperatureFlowPerHour {
+	timeOfSensor, _ := time.Parse(time.RFC3339, singleSensorData.Time)
+	tempOfSensor, _ := singleSensorData.SensorValues["Temp"].(float64)
+	// log.Printf("in TempFlowHourUpdate Temp of current Sensor: %v of Type %T", tempOfSensor, tempOfSensor)
+	if len(temperaturePackageFlowData) != 0 {
+		// log.Printf("from SensorFlowUpdate: SensorFlowHour is : %v", sensorPackageFlowData[0].HourTimeData)
+		lastTempHour := len(temperaturePackageFlowData) - 1
+		currentTempHour, _ := time.Parse(time.RFC3339, temperaturePackageFlowData[lastTempHour].HourTimeData)
+		if timeOfSensor.Before(currentTempHour.Add(time.Hour * 1)) {
+			// log.Printf("from SensorFlowUpdate-sensorBefore-true")
+			temperaturePackageFlowData[lastTempHour].TemperatureSum += tempOfSensor
+			temperaturePackageFlowData[lastTempHour].QuantitiyOfEntrys++
+		} else {
+			// log.Printf("from SensorFlowUpdate-sensorBefore-false - next hour")
+			temperaturePackageFlowData = append(temperaturePackageFlowData, TemperatureFlowPerHour{HourTimeData: singleSensorData.Time, TemperatureSum: singleSensorData.SensorValues["Temp"].(float64), QuantitiyOfEntrys: 1.0})
+			log.Printf("Next SensorFlowHour at: %v", temperaturePackageFlowData[1].HourTimeData)
+		}
+	}
+	if len(temperaturePackageFlowData) == 0 {
+		temperaturePackageFlowData = append(temperaturePackageFlowData, TemperatureFlowPerHour{HourTimeData: singleSensorData.Time, TemperatureSum: singleSensorData.SensorValues["Temp"].(float64), QuantitiyOfEntrys: 1.0})
+		log.Printf("First TempFlowHour added!")
+	}
+	return temperaturePackageFlowData
+}
+
 func QuantifyPerSensorPackages(singleSensorData sensors.SensorData, currentSensorQuantities PackagesPerSensorCount) PackagesPerSensorCount {
 	switch singleSensorData.DeviceID {
 	case "KuecheTempHumidLicht":
@@ -158,6 +194,28 @@ func ParseSensorFlowPerHourJson(sensorPackageFlowData []SensorFlowPerHour) Senso
 	}
 }
 
+func ParseTemperatureFlowPerHourJson(temperaturePackageFlowData []TemperatureFlowPerHour) TemperatureFlowPerHourPackageJson {
+	numOfDays := 3
+	if len(temperaturePackageFlowData) <= (numOfDays * 24) {
+		input := temperaturePackageFlowData
+		result := TemperatureFlowPerHourPackageJson{HourMatrix: make([]string, len(input)), TemperatureMatrix: make([]float64, len(input))}
+		for i, entry := range input {
+			result.HourMatrix[i] = entry.HourTimeData[11:13] + ":00" // 2019-08-06T14:13:12.746280Z
+			result.TemperatureMatrix[i] = (entry.TemperatureSum / entry.QuantitiyOfEntrys)
+		}
+		// log.Printf("Current TempFlowJSON: %v", result)
+		return result
+	} else {
+		input := temperaturePackageFlowData[(len(temperaturePackageFlowData) - (numOfDays * 24)):len(temperaturePackageFlowData)]
+		result := TemperatureFlowPerHourPackageJson{HourMatrix: make([]string, len(input)), TemperatureMatrix: make([]float64, len(input))}
+		for i, entry := range input {
+			result.HourMatrix[i] = entry.HourTimeData[11:13] + ":00" // 2019-08-06T14:13:12.746280Z
+			result.TemperatureMatrix[i] = (entry.TemperatureSum / entry.QuantitiyOfEntrys)
+		}
+		return result
+	}
+}
+
 func ParseSensorFlowPerDayJson(sensorPackageFlowData []SensorFlowPerDay) SensorFlowPerDayPackageJson {
 	if len(sensorPackageFlowData) <= 14 {
 		input := sensorPackageFlowData
@@ -178,15 +236,18 @@ func ParseSensorFlowPerDayJson(sensorPackageFlowData []SensorFlowPerDay) SensorF
 	}
 }
 
-func UpdateAnalysisData(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus, sensorPackageHourFlowData []SensorFlowPerHour, sensorPackageDayFlowData []SensorFlowPerDay, currentSensorQuantities PackagesPerSensorCount) (WindowContactsStatus, []SensorFlowPerHour, []SensorFlowPerDay, PackagesPerSensorCount) {
+func UpdateAnalysisData(singleSensorData sensors.SensorData, currentWindowStatus WindowContactsStatus, temperatureFlowHourData []TemperatureFlowPerHour, sensorPackageHourFlowData []SensorFlowPerHour, sensorPackageDayFlowData []SensorFlowPerDay, currentSensorQuantities PackagesPerSensorCount) (WindowContactsStatus, []TemperatureFlowPerHour, []SensorFlowPerHour, []SensorFlowPerDay, PackagesPerSensorCount) {
 	// log.Printf("From UpdateFunc: now SensorFlowHourArray length is : %v", len(sensorPackageFlowData))
 	if singleSensorData.DeviceType == "FensterKontakt" {
 		currentWindowStatus = WindowContactSensorsUpdate(singleSensorData, currentWindowStatus)
+	} else if singleSensorData.DeviceType == "KuecheKombi" {
+		temperatureFlowHourData = TemperatureFlowHourArrayUpdate(singleSensorData, temperatureFlowHourData)
+		// log.Printf("Current TempFlowData[]: %v", temperatureFlowHourData)
 	}
 	sensorPackageHourFlowData = SensorFlowHourArrayUpdate(singleSensorData, sensorPackageHourFlowData)
 	sensorPackageDayFlowData = SensorFlowDayArrayUpdate(singleSensorData, sensorPackageDayFlowData)
 	currentSensorQuantities = QuantifyPerSensorPackages(singleSensorData, currentSensorQuantities)
-	return currentWindowStatus, sensorPackageHourFlowData, sensorPackageDayFlowData, currentSensorQuantities
+	return currentWindowStatus, temperatureFlowHourData, sensorPackageHourFlowData, sensorPackageDayFlowData, currentSensorQuantities
 }
 
 func DrawWindowStatus(w http.ResponseWriter, currentWindowStatus WindowContactsStatus) {
